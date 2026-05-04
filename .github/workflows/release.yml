@@ -1,0 +1,62 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and release
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Build Chrome zip
+        run: npm run zip
+
+      - name: Build Firefox zip
+        run: npm run zip:firefox
+
+      - name: Generate release notes
+        id: notes
+        run: |
+          tag="${GITHUB_REF#refs/tags/}"
+          prev=$(git describe --tags --abbrev=0 "$tag^" 2>/dev/null || echo "")
+          if [ -z "$prev" ]; then
+            range="$tag"
+          else
+            range="$prev..$tag"
+          fi
+          {
+            echo 'NOTES<<EOF_NOTES'
+            echo "## What's changed in $tag"
+            echo
+            git log --pretty='format:- %s (%h)' "$range" | grep -E '^- (feat|fix|perf|docs|refactor)' || true
+            echo
+            echo "EOF_NOTES"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            .output/inputr-*-chrome.zip
+            .output/inputr-*-firefox.zip
+          body: ${{ steps.notes.outputs.NOTES }}
+          draft: false
+          prerelease: ${{ contains(github.ref, '-') }}
