@@ -1,0 +1,26 @@
+# Vercel only deploys the landing/ directory — exclude the extension build
+# artifacts and source from upload to keep deploys fast.
+
+node_modules
+.output
+.wxt
+coverage
+playwright-report
+test-results
+
+entrypoints
+src
+tests
+public
+docs
+
+# Extension config — not relevant to the static landing
+wxt.config.ts
+vitest.config.ts
+playwright.config.ts
+eslint.config.js
+prettier.config.js
+commitlint.config.js
+tsconfig.json
+plan.md
+.husky

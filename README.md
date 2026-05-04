@@ -1,25 +1,25 @@
 # Inputr
 
 > Fix any image upload box on the web. Detects upload constraints, lets you
-> upload+crop, create from text, or draw — at the exact target dimensions.
+> upload and crop, create from text, or draw at the exact target dimensions.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-blue.svg)](https://developer.chrome.com/docs/extensions/mv3/intro/)
 [![Built with WXT](https://img.shields.io/badge/Built%20with-WXT-15a14a.svg)](https://wxt.dev)
 
-Every site that accepts image uploads has different constraints — LinkedIn
+Every site that accepts image uploads has different constraints. LinkedIn
 banner is 1584×396, GitHub avatar is square at 1MB, YouTube watermark is
 150×150. Inputr collapses the "open Photoshop, resize, export, re-upload"
 dance into a sidebar that lives in the same tab.
 
 ## Modes
 
-- **Upload + Crop** — drop an image, auto-crop to the detected aspect ratio,
+- **Upload + Crop.** Drop an image. Auto-crop to the detected aspect ratio,
   auto-compress to the size budget, auto-convert to an accepted format.
-- **Create** — background (solid / gradient / image) + text + optional logo
+- **Create.** Background (solid, gradient, or image), text, optional logo,
   composed onto a canvas at the exact target dimensions.
-- **Draw** — sketch on a canvas locked to target dimensions. Pen, eraser,
-  shapes, undo/redo.
+- **Draw.** Sketch on a canvas locked to target dimensions. Pen, eraser,
+  shapes, undo and redo.
 
 After producing an image, you can **Download**, **Copy** to clipboard, or
 **Try insert** which uses `DataTransfer` to set the page's file input
@@ -80,6 +80,12 @@ Architecture deep-dive: [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
 Inputr is local-first forever. No analytics. No telemetry. No accounts. No
 third-party network calls.
 
+## Landing page
+
+Static HTML/CSS/JS in [`landing/`](./landing). Deployed on Vercel via the
+root `vercel.json` (skips the extension build, serves `landing/` directly).
+Local preview: `npx --yes http-server landing -p 4321 -o`.
+
 ## Contributing
 
 Issues and PRs welcome. Read [CONTRIBUTING.md](./CONTRIBUTING.md) for setup,
@@ -88,4 +94,4 @@ coding standards, and how to add new sites or modes. We follow the
 
 ## License
 
-[MIT](./LICENSE) — free forever, open source.
+[MIT](./LICENSE). Free forever, open source.

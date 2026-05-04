@@ -1,0 +1,573 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#fd6d2c" />
+    <meta name="color-scheme" content="light" />
+
+    <title>Inputr. The upload box, fixed.</title>
+    <meta
+      name="description"
+      content="A free Chrome extension that reads upload constraints from any site and gives you a canvas at exactly the right size. Local. MIT licensed. No tracking."
+    />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Inputr. The upload box, fixed." />
+    <meta
+      property="og:description"
+      content="Reads what the site wants. Crops, creates, or draws to spec. Same tab. Free, MIT, local forever."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="author" content="Naman Barkiya" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin="anonymous"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+
+  <body>
+    <a href="#main" class="skip">Skip to content</a>
+
+    <div class="grain" aria-hidden="true"></div>
+
+    <header class="nav">
+      <a class="nav-brand" href="/" aria-label="Inputr home">
+        <img src="./logo.svg" alt="Inputr" class="nav-logo" />
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="#how">How it works</a>
+        <a href="#modes">Modes</a>
+        <a href="#sites">Sites</a>
+        <a href="#privacy">Privacy</a>
+      </nav>
+      <div class="nav-actions">
+        <a
+          class="nav-link"
+          href="https://github.com/namanbarkiya/inputr"
+          target="_blank"
+          rel="noopener"
+          aria-label="View Inputr on GitHub"
+        >
+          GitHub
+        </a>
+        <a
+          class="btn btn-primary"
+          href="https://github.com/namanbarkiya/inputr"
+          target="_blank"
+          rel="noopener"
+          >Install free</a
+        >
+      </div>
+    </header>
+
+    <main id="main">
+      <!-- ========================================================
+           HERO
+           ======================================================== -->
+      <section class="hero">
+        <div class="hero-glow" aria-hidden="true"></div>
+
+        <p class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          v1.0 in beta &nbsp;·&nbsp; MIT licensed &nbsp;·&nbsp; No tracking
+        </p>
+
+        <h1 class="hero-title">
+          The upload box,<br />
+          finally fixed.
+        </h1>
+
+        <p class="hero-sub">
+          Inputr reads the dimensions every site secretly wants and gives
+          you a canvas at exactly that size. No Photoshop. No tab switching.
+          Just the right image, right where you are.
+        </p>
+
+        <div class="hero-cta">
+          <a
+            class="btn btn-primary btn-lg"
+            href="https://github.com/namanbarkiya/inputr"
+            target="_blank"
+            rel="noopener"
+          >
+            Install free
+            <span class="btn-arrow" aria-hidden="true">→</span>
+          </a>
+          <a class="link-cta" href="#how">
+            How it works
+            <span aria-hidden="true">↓</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- ========================================================
+           SHOWCASE
+           ======================================================== -->
+      <section class="showcase" aria-label="Inputr in action">
+        <div class="browser">
+          <div class="browser-bar">
+            <span class="browser-dot browser-dot-r"></span>
+            <span class="browser-dot browser-dot-y"></span>
+            <span class="browser-dot browser-dot-g"></span>
+            <span class="browser-addr">linkedin.com/in/me/edit/banner</span>
+            <span class="browser-pin" aria-label="Inputr extension active">
+              <span class="browser-pin-dot"></span>
+            </span>
+          </div>
+          <div class="browser-body">
+            <div class="page">
+              <div class="page-h"></div>
+              <div class="page-line"></div>
+              <div class="page-line short"></div>
+              <div class="page-upload">
+                <span class="page-upload-arrow">↑</span>
+                <span>Drop your banner here</span>
+                <em>1584 × 396, max 8 MB</em>
+              </div>
+            </div>
+
+            <aside class="panel">
+              <header class="panel-head">
+                <span class="panel-mark"></span>
+                <span class="panel-name">Inputr</span>
+              </header>
+
+              <div class="panel-detect">
+                <strong>LinkedIn banner</strong>
+                <span>1584 × 396 · PNG/JPEG · max 8&nbsp;MB</span>
+              </div>
+
+              <div class="panel-tabs">
+                <button class="panel-tab is-on" data-tab="upload">
+                  Upload
+                </button>
+                <button class="panel-tab" data-tab="create">Create</button>
+                <button class="panel-tab" data-tab="draw">Draw</button>
+              </div>
+
+              <div class="panel-stage">
+                <div class="panel-canvas is-on" data-stage="upload">
+                  <span class="canvas-photo"></span>
+                  <span class="canvas-frame"></span>
+                </div>
+                <div class="panel-canvas" data-stage="create">
+                  <span class="canvas-text">Aa</span>
+                  <span class="canvas-logo"></span>
+                </div>
+                <div class="panel-canvas" data-stage="draw">
+                  <svg viewBox="0 0 240 90" preserveAspectRatio="none">
+                    <path
+                      d="M12 60 Q40 14 76 44 T148 32 T220 50"
+                      fill="none"
+                      stroke="#fd6d2c"
+                      stroke-width="4"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                </div>
+              </div>
+
+              <div class="panel-actions">
+                <span class="panel-btn panel-btn-primary">Download</span>
+                <span class="panel-btn">Copy</span>
+                <span class="panel-btn">Insert</span>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================
+           EDITORIAL (asymmetric, like Warwick)
+           ======================================================== -->
+      <section class="editorial">
+        <div class="editorial-cards" aria-hidden="true">
+          <figure class="ed-card ed-card-1">
+            <div class="ed-card-art ed-art-banner"></div>
+            <figcaption>
+              <span>LinkedIn banner</span>
+              <em>1584 × 396</em>
+            </figcaption>
+          </figure>
+          <figure class="ed-card ed-card-2">
+            <div class="ed-card-art ed-art-avatar"></div>
+            <figcaption>
+              <span>GitHub avatar</span>
+              <em>460 × 460</em>
+            </figcaption>
+          </figure>
+          <figure class="ed-card ed-card-3">
+            <div class="ed-card-art ed-art-cover"></div>
+            <figcaption>
+              <span>Notion cover</span>
+              <em>1500 × 600</em>
+            </figcaption>
+          </figure>
+        </div>
+
+        <div class="editorial-text">
+          <p class="quote">
+            "It reads what the site wants and hands you the right canvas.
+            The upload box stops being a tax."
+          </p>
+          <p class="quote-meta">
+            <span>The whole point</span>
+            <span class="quote-dash"></span>
+            <span>What Inputr does</span>
+          </p>
+          <a class="link-rule" href="#how">
+            <span>See how it works</span>
+            <span class="rule"></span>
+            <span class="rule-dot"></span>
+          </a>
+        </div>
+      </section>
+
+      <!-- ========================================================
+           HOW IT WORKS
+           ======================================================== -->
+      <section class="how" id="how">
+        <header class="section-head">
+          <span class="kicker">How it works</span>
+          <h2>Three steps. Zero leaving the tab.</h2>
+        </header>
+
+        <ol class="steps">
+          <li class="step">
+            <span class="step-num">01</span>
+            <h3>Detect</h3>
+            <p>
+              A content script scans the page for image upload boxes. Known
+              sites use a hardcoded selector. Everywhere else, dimensions
+              are parsed from the helper text near the input.
+            </p>
+          </li>
+          <li class="step">
+            <span class="step-num">02</span>
+            <h3>Compose</h3>
+            <p>
+              Pick a mode. Upload and crop, create from text, or draw from
+              scratch. Every export renders at the native target resolution,
+              not the displayed one.
+            </p>
+          </li>
+          <li class="step">
+            <span class="step-num">03</span>
+            <h3>Ship</h3>
+            <p>
+              Download, copy to clipboard, or auto-insert into the page's
+              file input. Clipboard fallback for the sites that block direct
+              insertion.
+            </p>
+          </li>
+        </ol>
+      </section>
+
+      <!-- ========================================================
+           MODES (alternating zig-zag)
+           ======================================================== -->
+      <section class="modes" id="modes">
+        <header class="section-head">
+          <span class="kicker">Three modes</span>
+          <h2>One panel. Three ways to make the right image.</h2>
+        </header>
+
+        <div class="mode mode-1">
+          <div class="mode-info">
+            <span class="mode-num">01</span>
+            <h3>Upload and crop.</h3>
+            <p>
+              Drop the image you have. Inputr crops to the right ratio,
+              compresses to fit the size budget, and converts to a format
+              the site accepts. Cropper.js handles the interactive crop.
+              Compression runs in a Web Worker.
+            </p>
+            <ul class="mode-bullets">
+              <li>Aspect-locked crop window</li>
+              <li>Iterative quality stepdown</li>
+              <li>Live size readout</li>
+            </ul>
+          </div>
+          <div class="mode-art mode-art-upload">
+            <span class="art-photo"></span>
+            <span class="art-crop"></span>
+            <span class="art-corner art-tl"></span>
+            <span class="art-corner art-tr"></span>
+            <span class="art-corner art-bl"></span>
+            <span class="art-corner art-br"></span>
+            <span class="art-tag">1584 × 396</span>
+          </div>
+        </div>
+
+        <div class="mode mode-2">
+          <div class="mode-art mode-art-create">
+            <span class="art-bg"></span>
+            <span class="art-headline">Aa</span>
+            <span class="art-tag art-tag-light">PNG · 1500 × 500</span>
+          </div>
+          <div class="mode-info">
+            <span class="mode-num">02</span>
+            <h3>Create from text.</h3>
+            <p>
+              Background, headline, optional logo. Composed onto a canvas
+              at the exact target dimensions. Six gradient presets to start,
+              or pick your own colors. The render pipeline is vanilla
+              canvas, no framework overhead.
+            </p>
+            <ul class="mode-bullets">
+              <li>Solid, gradient, or image background</li>
+              <li>Position grid for text and logo</li>
+              <li>Debounced live preview</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="mode mode-3">
+          <div class="mode-info">
+            <span class="mode-num">03</span>
+            <h3>Draw it yourself.</h3>
+            <p>
+              A canvas locked to the target size. Pen, eraser, line,
+              rectangle, circle, arrow, undo, redo. Konva.js handles the
+              stage. Exports at native resolution, no scaling artifacts.
+            </p>
+            <ul class="mode-bullets">
+              <li>Pen plus five shape tools</li>
+              <li>Stroke-history undo and redo</li>
+              <li>Native-resolution export</li>
+            </ul>
+          </div>
+          <div class="mode-art mode-art-draw">
+            <svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid meet">
+              <path
+                d="M20 130 Q60 30 110 90 T200 60 T300 100"
+                fill="none"
+                stroke="#fd6d2c"
+                stroke-width="6"
+                stroke-linecap="round"
+              />
+              <circle cx="20" cy="130" r="5" fill="#fd6d2c" />
+              <circle cx="300" cy="100" r="5" fill="#fd6d2c" />
+            </svg>
+            <span class="art-tag">460 × 460</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================
+           PRIVACY (full-bleed warm-dark)
+           ======================================================== -->
+      <section class="privacy" id="privacy">
+        <div class="privacy-glow" aria-hidden="true"></div>
+        <div class="privacy-inner">
+          <div class="privacy-head">
+            <span class="kicker kicker-on-dark">How it stays clean</span>
+            <h2>Local. Forever.</h2>
+            <p>
+              Inputr runs entirely in your browser. Your images never leave
+              your machine. Read the source. Read the build. Run it locally.
+            </p>
+          </div>
+
+          <div class="zeros">
+            <div class="zero">
+              <span class="zero-num">No</span>
+              <span class="zero-label">Analytics</span>
+            </div>
+            <div class="zero">
+              <span class="zero-num">No</span>
+              <span class="zero-label">Trackers</span>
+            </div>
+            <div class="zero">
+              <span class="zero-num">No</span>
+              <span class="zero-label">Accounts</span>
+            </div>
+            <div class="zero">
+              <span class="zero-num">No</span>
+              <span class="zero-label">Network calls</span>
+            </div>
+            <div class="zero">
+              <span class="zero-num">No</span>
+              <span class="zero-label">Backend</span>
+            </div>
+            <div class="zero">
+              <span class="zero-num">No</span>
+              <span class="zero-label">Dark patterns</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================
+           SITES
+           ======================================================== -->
+      <section class="sites" id="sites">
+        <header class="section-head">
+          <span class="kicker">Supported sites</span>
+          <h2>Five today. Yours next.</h2>
+          <p class="section-sub">
+            On these sites Inputr applies known-good constraints
+            automatically. Everywhere else it parses dimensions from the
+            page text. Want one added? Open a PR with the selector and a
+            fixture.
+          </p>
+        </header>
+
+        <div class="site-grid">
+          <article class="site-card">
+            <div class="site-dim">1584 × 396</div>
+            <header>
+              <h3>LinkedIn</h3>
+              <span>banner</span>
+            </header>
+            <p class="site-meta">PNG · JPEG · max 8 MB</p>
+          </article>
+          <article class="site-card">
+            <div class="site-dim">1500 × 500</div>
+            <header>
+              <h3>X / Twitter</h3>
+              <span>header</span>
+            </header>
+            <p class="site-meta">PNG · JPEG · max 5 MB</p>
+          </article>
+          <article class="site-card">
+            <div class="site-dim">460 × 460</div>
+            <header>
+              <h3>GitHub</h3>
+              <span>avatar</span>
+            </header>
+            <p class="site-meta">PNG · JPEG · GIF · max 1 MB</p>
+          </article>
+          <article class="site-card">
+            <div class="site-dim">1500 × 600</div>
+            <header>
+              <h3>Notion</h3>
+              <span>page cover</span>
+            </header>
+            <p class="site-meta">PNG · JPEG · max 5 MB</p>
+          </article>
+          <article class="site-card">
+            <div class="site-dim">150 × 150</div>
+            <header>
+              <h3>YouTube</h3>
+              <span>watermark</span>
+            </header>
+            <p class="site-meta">PNG · JPEG · BMP · max 1 MB</p>
+          </article>
+          <a
+            class="site-card site-card-add"
+            href="https://github.com/namanbarkiya/inputr/blob/main/docs/ADDING_A_SITE.md"
+            target="_blank"
+            rel="noopener"
+          >
+            <div class="site-dim">+ add</div>
+            <header>
+              <h3>Your site</h3>
+              <span>open a PR</span>
+            </header>
+            <p class="site-meta">10 lines of TypeScript and a fixture ↗</p>
+          </a>
+        </div>
+      </section>
+
+      <!-- ========================================================
+           INSTALL
+           ======================================================== -->
+      <section class="install" id="install">
+        <header class="section-head">
+          <span class="kicker">Install</span>
+          <h2>Make uploads stop hurting.</h2>
+        </header>
+
+        <div class="install-grid">
+          <a
+            class="install-card install-primary"
+            href="https://github.com/namanbarkiya/inputr"
+            target="_blank"
+            rel="noopener"
+          >
+            <span class="install-status">Open source · MIT</span>
+            <h3>Get it on GitHub</h3>
+            <p>
+              The full extension lives in the repo. Star it to follow new
+              releases, open an issue, or send a PR. Chrome Web Store
+              listing comes after v1 is signed off.
+            </p>
+            <span class="install-foot">
+              <span>github.com/namanbarkiya/inputr</span>
+              <span class="install-arrow">↗</span>
+            </span>
+          </a>
+
+          <a
+            class="install-card"
+            href="https://github.com/namanbarkiya/inputr#install"
+            target="_blank"
+            rel="noopener"
+          >
+            <span class="install-status">Available now</span>
+            <h3>Build from source</h3>
+            <p>
+              <code>git clone</code> the repo, run <code>npm install</code>
+              and <code>npm run zip</code>, side-load the
+              <code>.zip</code> into Chrome. Two minutes, end to end.
+            </p>
+            <span class="install-foot">
+              <span>Setup steps in the README</span>
+              <span class="install-arrow">↗</span>
+            </span>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-top">
+        <a class="footer-logo" href="/" aria-label="Inputr home">
+          <img src="./logo.svg" alt="Inputr" />
+        </a>
+        <p class="footer-tag">
+          Free forever. Open source since day one. <br />Built so the upload
+          box gets out of your way.
+        </p>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copy">
+          MIT licensed. Built by
+          <a href="https://github.com/namanbarkiya" target="_blank">Naman Barkiya</a>.
+        </p>
+        <nav class="footer-nav" aria-label="Footer">
+          <a href="https://github.com/namanbarkiya/inputr" target="_blank">GitHub</a>
+          <a
+            href="https://github.com/namanbarkiya/inputr/blob/main/LICENSE"
+            target="_blank"
+            >License</a
+          >
+          <a
+            href="https://github.com/namanbarkiya/inputr/blob/main/SECURITY.md"
+            target="_blank"
+            >Security</a
+          >
+          <a
+            href="https://github.com/namanbarkiya/inputr/blob/main/CONTRIBUTING.md"
+            target="_blank"
+            >Contribute</a
+          >
+        </nav>
+      </div>
+    </footer>
+
+    <script src="./script.js" defer></script>
+  </body>
+</html>
