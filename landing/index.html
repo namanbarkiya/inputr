@@ -372,11 +372,12 @@
         <div class="privacy-glow" aria-hidden="true"></div>
         <div class="privacy-inner">
           <div class="privacy-head">
-            <span class="kicker kicker-on-dark">How it stays clean</span>
+            <span class="kicker kicker-on-dark">How the extension stays clean</span>
             <h2>Local. Forever.</h2>
             <p>
-              Inputr runs entirely in your browser. Your images never leave
-              your machine. Read the source. Read the build. Run it locally.
+              The Inputr extension runs entirely in your browser. Your
+              images never leave your machine. Read the source. Read the
+              build. Run it locally.
             </p>
           </div>
 
@@ -545,7 +546,9 @@
       <div class="footer-bottom">
         <p class="footer-copy">
           MIT licensed. Built by
-          <a href="https://github.com/namanbarkiya" target="_blank">Naman Barkiya</a>.
+          <a href="https://github.com/namanbarkiya" target="_blank"
+            >Naman Barkiya</a
+          >. This page uses cookie-less Vercel analytics.
         </p>
         <nav class="footer-nav" aria-label="Footer">
           <a href="https://github.com/namanbarkiya/inputr" target="_blank">GitHub</a>
@@ -569,5 +572,18 @@
     </footer>
 
     <script src="./script.js" defer></script>
+
+    <!-- Vercel Web Analytics + Speed Insights. Cookie-less, no PII,
+         served from this same origin via Vercel's edge. Disclosed in
+         the footer alongside the extension's privacy claims. -->
+    <script>
+      window.va =
+        window.va ||
+        function () {
+          (window.vaq = window.vaq || []).push(arguments);
+        };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
+    <script defer src="/_vercel/speed-insights/script.js"></script>
   </body>
 </html>
