@@ -1,0 +1,13 @@
+node_modules
+.output
+.wxt
+dist
+coverage
+playwright-report
+test-results
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+*.min.js
+*.min.css
+public/**/*.svg

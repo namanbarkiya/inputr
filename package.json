@@ -1,0 +1,87 @@
+{
+  "name": "inputr",
+  "version": "0.1.0",
+  "description": "Fix any image upload box on the web. Detects constraints, lets you upload+crop, create, or draw at the exact dimensions.",
+  "type": "module",
+  "license": "MIT",
+  "private": true,
+  "homepage": "https://github.com/inputr/inputr#readme",
+  "bugs": {
+    "url": "https://github.com/inputr/inputr/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/inputr/inputr.git"
+  },
+  "keywords": [
+    "chrome-extension",
+    "manifest-v3",
+    "image-tools",
+    "developer-tools",
+    "typescript",
+    "wxt"
+  ],
+  "engines": {
+    "node": ">=20",
+    "npm": ">=10"
+  },
+  "scripts": {
+    "dev": "wxt",
+    "dev:firefox": "wxt -b firefox",
+    "build": "wxt build",
+    "build:firefox": "wxt build -b firefox",
+    "zip": "wxt zip",
+    "zip:firefox": "wxt zip -b firefox",
+    "compile": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "postinstall": "wxt prepare",
+    "prepare": "husky"
+  },
+  "dependencies": {
+    "@fontsource/poppins": "^5.2.7",
+    "browser-image-compression": "^2.0.2",
+    "cropperjs": "^2.0.0"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.6.1",
+    "@commitlint/config-conventional": "^19.6.0",
+    "@playwright/test": "^1.49.1",
+    "@types/chrome": "^0.0.287",
+    "@types/node": "^22.10.5",
+    "@typescript-eslint/eslint-plugin": "^8.19.1",
+    "@typescript-eslint/parser": "^8.19.1",
+    "@vitest/coverage-v8": "^2.1.8",
+    "@vitest/ui": "^2.1.8",
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "happy-dom": "^15.11.7",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.3.0",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.19.1",
+    "vitest": "^2.1.8",
+    "wxt": "^0.19.21"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,mjs,cjs}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,css,html,yml,yaml}": [
+      "prettier --write"
+    ]
+  }
+}

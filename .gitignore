@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# WXT outputs
+.output/
+.wxt/
+
+# Build outputs
+dist/
+build/
+backup/
+
+# Test artifacts
+coverage/
+playwright-report/
+test-results/
+.vitest-cache/
+
+# Editor
+.vscode/
+.cursor/
+.autopilot.json
+!.vscode/extensions.json
+!.vscode/settings.json.recommended
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Released zips (live in GitHub Releases, not in the repo)
+*.zip
+!tests/fixtures/**/*.zip
