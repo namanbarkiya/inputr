@@ -1,7 +1,8 @@
 # Inputr
 
-> Fix any image upload box on the web. Detects upload constraints, lets you
-> upload and crop, create from text, or draw at the exact target dimensions.
+> Fix any image upload box on the web. Detects upload constraints and lets
+> you crop the image you have to the exact target dimensions, in the same
+> tab.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-blue.svg)](https://developer.chrome.com/docs/extensions/mv3/intro/)
@@ -12,18 +13,29 @@ banner is 1584×396, GitHub avatar is square at 1MB, YouTube watermark is
 150×150. Inputr collapses the "open Photoshop, resize, export, re-upload"
 dance into a sidebar that lives in the same tab.
 
-## Modes
+## What ships in v0.1
 
-- **Upload + Crop.** Drop an image. Auto-crop to the detected aspect ratio,
-  auto-compress to the size budget, auto-convert to an accepted format.
-- **Create.** Background (solid, gradient, or image), text, optional logo,
-  composed onto a canvas at the exact target dimensions.
-- **Draw.** Sketch on a canvas locked to target dimensions. Pen, eraser,
-  shapes, undo and redo.
+Building in public, feature by feature. v0.1 ships **Upload + Crop**:
 
-After producing an image, you can **Download**, **Copy** to clipboard, or
-**Try insert** which uses `DataTransfer` to set the page's file input
-directly (with clipboard fallback).
+- Drop the image you have. Inputr auto-crops to the detected aspect ratio,
+  auto-compresses to the size budget, and auto-converts to a format the
+  site accepts.
+
+Three output paths, available on every result:
+
+- **Download.** Saves to disk with a smart filename like
+  `linkedin-banner-1584x396.png`.
+- **Copy** to clipboard. Paste into the upload box on sites that accept
+  paste.
+- **Try insert.** Uses `DataTransfer` to set the page's file input
+  directly. Falls back to clipboard with a clear toast if the site blocks
+  programmatic insertion.
+
+### Coming next
+
+- **Create** — background, text, optional logo, composed onto a canvas at
+  the exact target dimensions.
+- **Draw** — sketch on a canvas locked to the target size.
 
 ## Install
 

@@ -38,10 +38,10 @@ src/modes/<mode-id>/
 └── <mode-id>.test.ts # tests
 ```
 
-Use Mode 1 (`upload-crop`) as the smallest viable template. Mode 2
-(`create`) is a good example when your mode has form-driven config and a
-preview canvas. Mode 3 (`draw`) shows how to integrate a third-party canvas
-library (Konva).
+Use `src/modes/upload-crop/` as the template. It shows the full
+controller/UI split: `index.ts` owns the lifecycle and exports a class
+implementing `Mode`, `ui.ts` owns the DOM scaffolding and exposes a
+typed return shape, and a co-located `*.test.ts` covers the contract.
 
 ## Conventions
 
@@ -70,5 +70,5 @@ Required:
 - One error path (e.g. invalid input)
 - One edge case relevant to the mode (e.g. size budget exceeded)
 
-Mocking heavy libraries (Cropper.js, Konva) is fine — see
-`src/modes/draw/draw.test.ts` for an example.
+Mocking heavy libraries (Cropper.js, etc.) is fine. Co-locate the test
+with the mode at `src/modes/<mode-id>/<mode-id>.test.ts`.
