@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light" />
+    <title>Inputr</title>
+    <link rel="stylesheet" href="./sidepanel.css" />
+  </head>
+  <body>
+    <header class="ip-header">
+      <div class="ip-brand">
+        <img src="/icon/icon.png" alt="" class="ip-logo" />
+        <span class="ip-wordmark">Inputr</span>
+      </div>
+      <button
+        type="button"
+        class="ip-icon-btn"
+        id="open-settings"
+        aria-label="Open settings"
+        title="Settings"
+      >
+        ⚙
+      </button>
+    </header>
+
+    <section
+      class="ip-detection"
+      id="detection-banner"
+      aria-live="polite"
+    ></section>
+
+    <main class="ip-mode" id="mode-host" aria-live="polite">
+      <!-- Upload + Crop UI mounts here. Create and Draw modes ship later. -->
+    </main>
+
+    <footer class="ip-output" id="output-bar">
+      <div class="ip-output-meta">
+        <label class="ip-output-format">
+          <span class="ip-label">Format</span>
+          <select id="format-select" class="ip-select">
+            <option value="auto">Auto</option>
+            <option value="image/png">PNG</option>
+            <option value="image/jpeg">JPEG</option>
+          </select>
+        </label>
+        <span class="ip-output-filename" id="output-filename"></span>
+      </div>
+      <div class="ip-output-actions">
+        <button type="button" class="ip-btn ip-btn-primary" id="btn-download">
+          Download
+        </button>
+        <button type="button" class="ip-btn" id="btn-copy">Copy</button>
+        <button type="button" class="ip-btn" id="btn-insert">Try insert</button>
+      </div>
+    </footer>
+
+    <div class="ip-toasts" id="toast-stack" aria-live="polite"></div>
+
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

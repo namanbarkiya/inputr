@@ -1,0 +1,372 @@
+:root {
+  /* Brand: orange #fd6d2c on warm-white #f6f4f0 */
+  --ip-bg: #f6f4f0;
+  --ip-bg-card: #ffffff;
+  --ip-fg: #1a1612;
+  --ip-muted: #756e62;
+  --ip-border: #e6e1d6;
+  --ip-border-strong: #d4cdbf;
+  --ip-accent: #fd6d2c;
+  --ip-accent-hover: #ea5e1f;
+  --ip-accent-soft: #fde5d6;
+  --ip-success: #16a34a;
+  --ip-danger: #dc2626;
+  --ip-radius: 8px;
+  --ip-font:
+    'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  --ip-font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--ip-bg);
+  color: var(--ip-fg);
+  font-family: var(--ip-font);
+  font-size: 14px;
+  line-height: 1.45;
+  height: 100vh;
+  overflow: hidden;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-width: 320px;
+}
+
+.ip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--ip-border);
+}
+
+.ip-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.ip-logo {
+  width: 22px;
+  height: 22px;
+  display: block;
+  flex-shrink: 0;
+  border-radius: 5px;
+}
+
+.ip-wordmark {
+  letter-spacing: -0.01em;
+}
+
+.ip-icon-btn {
+  background: none;
+  border: 1px solid transparent;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: var(--ip-radius);
+  font-size: 16px;
+  color: var(--ip-muted);
+}
+
+.ip-icon-btn:hover {
+  background: var(--ip-accent-soft);
+  color: var(--ip-accent);
+}
+
+.ip-detection {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--ip-border);
+  font-size: 13px;
+  color: var(--ip-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ip-detection strong {
+  color: var(--ip-fg);
+  font-weight: 600;
+}
+
+.ip-detection-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.ip-link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--ip-accent);
+  cursor: pointer;
+  font: inherit;
+  text-decoration: underline;
+}
+
+.ip-mode {
+  flex: 1;
+  overflow: auto;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ip-output {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--ip-border);
+  background: var(--ip-bg-card);
+}
+
+.ip-output-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.ip-output-format {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.ip-output-format .ip-label {
+  margin: 0;
+}
+
+.ip-output-format select {
+  min-width: 80px;
+}
+
+.ip-output-filename {
+  font-size: 12px;
+  color: var(--ip-muted);
+  font-family: var(--ip-font-mono);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ip-output-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.ip-output-actions .ip-btn {
+  flex: 1;
+}
+
+.ip-btn {
+  flex: 1;
+  background: var(--ip-bg-card);
+  color: var(--ip-fg);
+  border: 1px solid var(--ip-border);
+  padding: 8px 12px;
+  border-radius: var(--ip-radius);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.ip-btn:hover:not(:disabled) {
+  border-color: var(--ip-accent);
+  color: var(--ip-accent);
+}
+
+.ip-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ip-btn-primary {
+  background: var(--ip-accent);
+  color: white;
+  border-color: var(--ip-accent);
+}
+
+.ip-btn-primary:hover:not(:disabled) {
+  background: var(--ip-accent-hover);
+  border-color: var(--ip-accent-hover);
+}
+
+/* Form controls */
+
+.ip-control {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ip-label {
+  font-size: 12px;
+  color: var(--ip-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.ip-input,
+.ip-select {
+  background: var(--ip-bg-card);
+  border: 1px solid var(--ip-border);
+  border-radius: var(--ip-radius);
+  padding: 6px 8px;
+  font: inherit;
+  color: var(--ip-fg);
+}
+
+.ip-input:focus,
+.ip-select:focus {
+  outline: 2px solid var(--ip-accent);
+  outline-offset: -1px;
+}
+
+.ip-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.ip-row > * {
+  flex: 1;
+}
+
+/* Drop zone — has two visual modes:
+   - .is-empty (no image yet): grows to fill the available area,
+     larger typography, generous padding so it reads as the primary
+     action.
+   - default (image loaded): compact "swap image" affordance above
+     the cropper. */
+
+.ip-drop {
+  border: 2px dashed var(--ip-border-strong);
+  border-radius: var(--ip-radius);
+  padding: 16px;
+  text-align: center;
+  color: var(--ip-muted);
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease,
+    background 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.ip-drop.is-empty {
+  flex: 1 1 auto;
+  min-height: 360px;
+  padding: 56px 24px;
+  font-size: 16px;
+  gap: 10px;
+}
+
+.ip-drop:hover,
+.ip-drop.is-drag {
+  border-color: var(--ip-accent);
+  color: var(--ip-accent);
+  background: var(--ip-accent-soft);
+}
+
+.ip-drop .ip-drop-line {
+  font-weight: 600;
+  color: var(--ip-fg);
+}
+
+.ip-drop.is-empty .ip-drop-line {
+  font-size: 22px;
+  letter-spacing: -0.01em;
+}
+
+.ip-drop .ip-drop-sub {
+  color: var(--ip-muted);
+}
+
+.ip-drop input[type='file'] {
+  display: none;
+}
+
+/* Crop container. Grows to fill the remaining vertical space inside the
+   side panel so the cropper stays visually dominant. */
+
+.ip-cropper {
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 420px;
+  background: #1a1612;
+  border-radius: var(--ip-radius);
+  overflow: hidden;
+  /* Defensive: don't let flex shrinking collapse the height. */
+  align-self: stretch;
+}
+
+.ip-cropper cropper-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Toast */
+
+.ip-toasts {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.ip-toast {
+  background: var(--ip-fg);
+  color: white;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: ip-toast-in 0.18s ease;
+  max-width: 320px;
+}
+
+.ip-toast.is-success {
+  background: var(--ip-success);
+}
+
+.ip-toast.is-error {
+  background: var(--ip-danger);
+}
+
+@keyframes ip-toast-in {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+

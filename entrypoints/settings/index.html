@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light" />
+    <title>Inputr settings</title>
+    <link rel="stylesheet" href="./settings.css" />
+  </head>
+  <body>
+    <main class="container">
+      <header>
+        <h1>Inputr settings</h1>
+        <p class="muted">
+          Local-only preferences. Nothing leaves your machine.
+        </p>
+      </header>
+
+      <section class="card">
+        <div class="control">
+          <label for="default-format">Default output format</label>
+          <select id="default-format">
+            <option value="auto">Auto (match site)</option>
+            <option value="image/png">PNG</option>
+            <option value="image/jpeg">JPEG</option>
+          </select>
+        </div>
+
+        <div class="control">
+          <label for="jpeg-quality">JPEG quality</label>
+          <div class="row">
+            <input
+              type="range"
+              id="jpeg-quality"
+              min="1"
+              max="100"
+              step="1"
+              value="85"
+            />
+            <output id="jpeg-quality-value">85</output>
+          </div>
+        </div>
+
+        <div class="control">
+          <label class="checkbox">
+            <input type="checkbox" id="show-badge" checked />
+            <span>Show toolbar badge when an upload box is detected</span>
+          </label>
+        </div>
+
+        <div class="actions">
+          <button type="button" id="save-btn" class="primary">Save</button>
+          <button type="button" id="reset-btn">Reset to defaults</button>
+        </div>
+
+        <div id="status" class="status" role="status" aria-live="polite"></div>
+      </section>
+    </main>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
