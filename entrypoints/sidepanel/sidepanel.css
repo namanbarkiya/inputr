@@ -247,6 +247,133 @@ body {
   flex: 1;
 }
 
+/* Stacked control with a header row that holds a label + value
+   (e.g. "Max file size           8 MB") on top of the input. */
+
+.ip-control-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ip-control-value {
+  font-family: var(--ip-font-mono);
+  font-size: 12px;
+  color: var(--ip-fg);
+  font-feature-settings: 'tnum' on;
+}
+
+/* Range slider styled to the brand. */
+
+.ip-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  background: var(--ip-border);
+  border-radius: 999px;
+  outline: none;
+  margin: 6px 0 2px;
+  cursor: pointer;
+  accent-color: var(--ip-accent);
+}
+
+.ip-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--ip-accent);
+  border: 2px solid var(--ip-bg-card);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+
+.ip-range::-webkit-slider-thumb:hover {
+  transform: scale(1.12);
+}
+
+.ip-range::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--ip-accent);
+  border: 2px solid var(--ip-bg-card);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+}
+
+.ip-range:focus-visible {
+  outline: 2px solid var(--ip-accent);
+  outline-offset: 4px;
+  border-radius: 999px;
+}
+
+/* Detection status line: "● Auto-detected: LinkedIn banner" */
+
+.ip-detect-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--ip-muted);
+  padding: 2px 0 2px;
+}
+
+.ip-detect-status strong {
+  color: var(--ip-fg);
+  font-weight: 600;
+}
+
+.ip-detect-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ip-border-strong);
+  flex-shrink: 0;
+}
+
+.ip-detect-dot.is-on {
+  background: var(--ip-accent);
+  box-shadow: 0 0 0 3px var(--ip-accent-soft);
+}
+
+/* Compact pill button used for "Auto detect". */
+
+.ip-chip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: var(--ip-bg-card);
+  border: 1px solid var(--ip-border);
+  border-radius: 999px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ip-fg);
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease,
+    background 0.15s ease;
+}
+
+.ip-chip-btn:hover {
+  border-color: var(--ip-accent);
+  color: var(--ip-accent);
+}
+
+.ip-chip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ip-accent);
+}
+
 /* Drop zone — has two visual modes:
    - .is-empty (no image yet): grows to fill the available area,
      larger typography, generous padding so it reads as the primary

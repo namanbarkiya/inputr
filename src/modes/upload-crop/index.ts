@@ -127,17 +127,20 @@ export class UploadCropMode implements Mode {
         log.warn('upload-crop', 'aspect ratio update failed', err);
       }
     }
-    // The current blob no longer matches the new dimensions, drop it
-    // so the panel disables the output buttons until the user re-applies.
+    // Drop the cached blob and trigger a fresh export so the new
+    // dimensions and size budget feed into compressToBudget. Without
+    // this, slider-only changes (which don't move the cropper
+    // selection) never re-run the compression pipeline.
     this.currentBlob = null;
+    if (this.cropper) this.scheduleExport();
   }
 
   updateFormat(format: ImageFormat, jpegQuality: number): void {
     if (!this.ctx) return;
     this.ctx.format = format;
     this.ctx.jpegQuality = jpegQuality;
-    // Format only affects the next export, not the loaded image.
     this.currentBlob = null;
+    if (this.cropper) this.scheduleExport();
   }
 
   private async loadImage(file: File, imgEl: HTMLImageElement): Promise<void> {

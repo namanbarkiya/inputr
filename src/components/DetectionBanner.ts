@@ -1,15 +1,23 @@
 /**
- * Detection banner.
+ * Detection / target panel.
  *
- * Top line summarises the current target (detected or manual). Below
- * that, two always-visible pixel inputs let the user retarget width and
- * height in place. Edits are debounced and pushed to the panel via
- * onOverride, which routes through Mode.updateConstraints so the loaded
- * image survives. A Rescan link stays accessible for re-running site
- * detection.
+ * Auto-detection runs on every page load via the content script. When
+ * it succeeds, the detected dimensions land in the inputs and the
+ * matching preset (if any) gets selected. When it fails, the user
+ * picks from a preset or types custom values.
+ *
+ * Layout, top to bottom:
+ *   - Status line ("Auto-detected: LinkedIn banner" / "No site detected")
+ *   - Preset dropdown with the common upload targets
+ *   - Width and Height pixel inputs (free-typing flips preset to Custom)
+ *   - Max file size slider (100 KB → 20 MB)
+ *   - "Auto detect" button to re-run detection on the current page
+ *
+ * Every change is debounced and pushed via onOverride, which routes
+ * through Mode.updateConstraints so the live cropper retargets in place
+ * without losing the loaded image.
  */
 
-import { formatConstraints } from '../lib/format';
 import type {
   DetectedConstraints,
   DetectionResult,
@@ -22,9 +30,36 @@ interface MountOpts {
   onRescan: () => void | Promise<void>;
 }
 
-const COMMIT_DEBOUNCE_MS = 300;
+interface Preset {
+  id: string;
+  label: string;
+  width: number;
+  height: number;
+  /** Max file size in MB. */
+  sizeMB: number;
+}
+
+const CUSTOM_ID = 'custom';
+
+const PRESETS: Preset[] = [
+  { id: 'linkedin-banner', label: 'LinkedIn banner', width: 1584, height: 396, sizeMB: 8 },
+  { id: 'linkedin-post', label: 'LinkedIn post', width: 1200, height: 627, sizeMB: 5 },
+  { id: 'profile-pic', label: 'Profile picture (square)', width: 512, height: 512, sizeMB: 2 },
+  { id: 'x-banner', label: 'X / Twitter banner', width: 1500, height: 500, sizeMB: 5 },
+  { id: 'x-post', label: 'X / Twitter post', width: 1600, height: 900, sizeMB: 5 },
+  { id: 'ig-square', label: 'Instagram square', width: 1080, height: 1080, sizeMB: 5 },
+  { id: 'ig-story', label: 'Instagram story / reel', width: 1080, height: 1920, sizeMB: 5 },
+  { id: 'yt-thumb', label: 'YouTube thumbnail', width: 1280, height: 720, sizeMB: 2 },
+  { id: 'yt-banner', label: 'YouTube banner', width: 2560, height: 1440, sizeMB: 6 },
+  { id: 'og-share', label: 'Social share (OG)', width: 1200, height: 630, sizeMB: 5 },
+];
+
+const COMMIT_DEBOUNCE_MS = 250;
 const MIN_PX = 8;
 const MAX_PX = 16384;
+const SIZE_MIN_KB = 100;
+const SIZE_MAX_KB = 20 * 1024; // 20 MB
+const SIZE_STEP_KB = 100;
 
 export function mountDetectionBanner(
   root: HTMLElement,
@@ -32,63 +67,123 @@ export function mountDetectionBanner(
 ): void {
   root.replaceChildren();
 
-  // ── Headline ──────────────────────────────────────────────
-  const headline = document.createElement('div');
-  if (opts.detection?.detected) {
-    headline.innerHTML = `<strong>${
-      opts.constraints.label ?? 'Detected on this page'
-    }:</strong> ${formatConstraints(opts.constraints)}`;
-  } else {
-    headline.innerHTML =
-      '<strong>No upload constraints detected.</strong> Edit dimensions below.';
-  }
-  root.appendChild(headline);
+  const startMatch = findMatchingPreset(opts.constraints);
 
-  // ── Width / Height inputs ────────────────────────────────
+  // ── Status line ──────────────────────────────────────────
+  const status = document.createElement('div');
+  status.className = 'ip-detect-status';
+  const dot = document.createElement('span');
+  dot.className = 'ip-detect-dot';
+  const text = document.createElement('span');
+  if (opts.detection?.detected) {
+    dot.classList.add('is-on');
+    const label = opts.constraints.label ?? 'page constraints';
+    text.innerHTML = `Auto-detected: <strong></strong>`;
+    text.querySelector('strong')!.textContent = label;
+  } else {
+    text.textContent = 'No site detected. Pick a preset or set custom values.';
+  }
+  status.append(dot, text);
+  root.appendChild(status);
+
+  // ── Preset row ────────────────────────────────────────────
+  const presetWrap = document.createElement('label');
+  presetWrap.className = 'ip-control';
+  const presetLabel = document.createElement('span');
+  presetLabel.className = 'ip-label';
+  presetLabel.textContent = 'Preset';
+  const presetSel = document.createElement('select');
+  presetSel.className = 'ip-select';
+  presetWrap.append(presetLabel, presetSel);
+
+  const customOpt = document.createElement('option');
+  customOpt.value = CUSTOM_ID;
+  customOpt.textContent = 'Custom';
+  presetSel.appendChild(customOpt);
+  for (const p of PRESETS) {
+    const o = document.createElement('option');
+    o.value = p.id;
+    o.textContent = `${p.label} · ${p.width} × ${p.height}`;
+    presetSel.appendChild(o);
+  }
+  presetSel.value = startMatch?.id ?? CUSTOM_ID;
+
+  // ── Width / Height row ───────────────────────────────────
   const dimsRow = document.createElement('div');
   dimsRow.className = 'ip-row';
-
   const width = mkPxInput('Width', opts.constraints.width);
   const height = mkPxInput('Height', opts.constraints.height);
   dimsRow.append(width.wrapper, height.wrapper);
-  root.appendChild(dimsRow);
 
-  // ── Rescan link ──────────────────────────────────────────
-  const actions = document.createElement('div');
-  actions.className = 'ip-detection-actions';
-  const rescan = document.createElement('button');
-  rescan.type = 'button';
-  rescan.className = 'ip-link-btn';
-  rescan.textContent = 'Rescan';
-  rescan.addEventListener('click', () => {
+  // ── Size slider row ──────────────────────────────────────
+  const sizeWrap = document.createElement('div');
+  sizeWrap.className = 'ip-control';
+  const sizeHead = document.createElement('div');
+  sizeHead.className = 'ip-control-head';
+  const sizeLabel = document.createElement('span');
+  sizeLabel.className = 'ip-label';
+  sizeLabel.textContent = 'Max file size';
+  const sizeValue = document.createElement('span');
+  sizeValue.className = 'ip-control-value';
+  sizeHead.append(sizeLabel, sizeValue);
+
+  const sizeSlider = document.createElement('input');
+  sizeSlider.type = 'range';
+  sizeSlider.className = 'ip-range';
+  sizeSlider.min = String(SIZE_MIN_KB);
+  sizeSlider.max = String(SIZE_MAX_KB);
+  sizeSlider.step = String(SIZE_STEP_KB);
+  sizeSlider.value = String(
+    clamp(
+      Math.round(opts.constraints.maxSizeBytes / 1024),
+      SIZE_MIN_KB,
+      SIZE_MAX_KB,
+    ),
+  );
+  sizeValue.textContent = formatSize(Number(sizeSlider.value));
+
+  sizeWrap.append(sizeHead, sizeSlider);
+
+  // ── Auto-detect button ───────────────────────────────────
+  const detectWrap = document.createElement('div');
+  detectWrap.className = 'ip-detection-actions';
+  const detectBtn = document.createElement('button');
+  detectBtn.type = 'button';
+  detectBtn.className = 'ip-chip-btn';
+  detectBtn.innerHTML = `<span class="ip-chip-dot"></span><span>Auto detect</span>`;
+  detectBtn.title = 'Re-run detection on the current page';
+  detectBtn.addEventListener('click', () => {
     void opts.onRescan();
   });
-  actions.appendChild(rescan);
-  root.appendChild(actions);
+  detectWrap.appendChild(detectBtn);
 
-  // ── Live commit ──────────────────────────────────────────
+  root.append(presetWrap, dimsRow, sizeWrap, detectWrap);
+
+  // ── Wire commits ─────────────────────────────────────────
   let timer: number | null = null;
+
   const commit = (): void => {
     const w = clamp(Number(width.input.value), MIN_PX, MAX_PX);
     const h = clamp(Number(height.input.value), MIN_PX, MAX_PX);
+    const sizeKB = clamp(
+      Number(sizeSlider.value),
+      SIZE_MIN_KB,
+      SIZE_MAX_KB,
+    );
     if (!Number.isFinite(w) || !Number.isFinite(h)) return;
-    if (w === opts.constraints.width && h === opts.constraints.height) return;
     const next: DetectedConstraints = {
       ...opts.constraints,
       width: w,
       height: h,
+      maxSizeBytes: sizeKB * 1024,
       source: 'manual',
     };
-    // Update local copy so the next commit-skip check (above) works
-    // against the latest values within this banner instance.
+    if (sameAs(opts.constraints, next)) return;
     opts.constraints = next;
-    headline.innerHTML = `<strong>${
-      next.label ?? 'Custom size'
-    }:</strong> ${formatConstraints(next)}`;
     opts.onOverride(next);
   };
 
-  const onInput = (): void => {
+  const debounceCommit = (): void => {
     if (timer !== null) clearTimeout(timer);
     timer = window.setTimeout(() => {
       timer = null;
@@ -96,10 +191,36 @@ export function mountDetectionBanner(
     }, COMMIT_DEBOUNCE_MS);
   };
 
-  width.input.addEventListener('input', onInput);
-  height.input.addEventListener('input', onInput);
+  // Preset change → load values, commit immediately.
+  presetSel.addEventListener('change', () => {
+    if (presetSel.value === CUSTOM_ID) return;
+    const p = PRESETS.find((x) => x.id === presetSel.value);
+    if (!p) return;
+    width.input.value = String(p.width);
+    height.input.value = String(p.height);
+    sizeSlider.value = String(p.sizeMB * 1024);
+    sizeValue.textContent = formatSize(Number(sizeSlider.value));
+    if (timer !== null) clearTimeout(timer);
+    timer = null;
+    commit();
+  });
 
-  // Commit on blur immediately so leaving the field always settles.
+  // Manual edits flip the preset back to Custom.
+  const onManualEdit = (): void => {
+    presetSel.value = CUSTOM_ID;
+    debounceCommit();
+  };
+  width.input.addEventListener('input', onManualEdit);
+  height.input.addEventListener('input', onManualEdit);
+
+  // Size slider live updates the value label and commits debounced.
+  sizeSlider.addEventListener('input', () => {
+    sizeValue.textContent = formatSize(Number(sizeSlider.value));
+    // Editing the size doesn't change dimensions, so don't flip preset.
+    debounceCommit();
+  });
+
+  // Flush on blur so leaving the field always settles.
   const flush = (): void => {
     if (timer !== null) {
       clearTimeout(timer);
@@ -109,11 +230,30 @@ export function mountDetectionBanner(
   };
   width.input.addEventListener('blur', flush);
   height.input.addEventListener('blur', flush);
+  sizeSlider.addEventListener('change', flush);
+}
+
+function findMatchingPreset(c: DetectedConstraints): Preset | null {
+  return PRESETS.find((p) => p.width === c.width && p.height === c.height) ?? null;
+}
+
+function sameAs(a: DetectedConstraints, b: DetectedConstraints): boolean {
+  return (
+    a.width === b.width &&
+    a.height === b.height &&
+    a.maxSizeBytes === b.maxSizeBytes
+  );
 }
 
 function clamp(n: number, min: number, max: number): number {
   if (!Number.isFinite(n)) return min;
   return Math.max(min, Math.min(max, Math.round(n)));
+}
+
+function formatSize(kb: number): string {
+  if (kb < 1024) return `${kb} KB`;
+  const mb = kb / 1024;
+  return mb >= 10 ? `${Math.round(mb)} MB` : `${mb.toFixed(1)} MB`;
 }
 
 function mkPxInput(
