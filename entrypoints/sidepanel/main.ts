@@ -1,14 +1,15 @@
 /**
  * Side panel entrypoint.
  *
- * v0.1 ships a single mode: Upload + Crop. The shell wires up:
+ * Two modes ship today: Upload + Crop and Create. The shell wires up:
  *   - Detection banner (reads chrome.storage.local for the active tab)
+ *   - Mode tabs (switch between Crop and Create)
  *   - Output bar (Format select + Download / Copy / Try insert)
  *   - Toasts for transient feedback
  *
- * The Mode contract (src/types/modes.ts) is generic enough that future
- * modes (Create, Draw) drop in by satisfying the interface, and the
- * shell adds tabs back when there is more than one to choose between.
+ * The Mode contract (src/types/modes.ts) is intentionally generic so
+ * future modes (e.g. Draw) drop in by satisfying the interface and
+ * registering in the MODE_REGISTRY below.
  */
 
 import '@fontsource/poppins/400.css';
@@ -17,6 +18,7 @@ import '@fontsource/poppins/600.css';
 import '@fontsource/poppins/700.css';
 
 import { mountDetectionBanner } from '../../src/components/DetectionBanner';
+import { mountModeTabs, type ModeTabSpec } from '../../src/components/ModeTabs';
 import { OutputBar } from '../../src/components/OutputBar';
 import { ToastStack } from '../../src/components/Toast';
 import {
@@ -29,6 +31,7 @@ import { pickOutputFormat } from '../../src/lib/format';
 import { log } from '../../src/lib/logger';
 import { sendMessage } from '../../src/lib/messaging';
 import { loadDetection, loadSettings } from '../../src/lib/storage';
+import { CreateMode } from '../../src/modes/create';
 import { UploadCropMode } from '../../src/modes/upload-crop';
 import {
   DEFAULT_CONSTRAINTS,
@@ -36,7 +39,7 @@ import {
   type DetectionResult,
   type ImageFormat,
 } from '../../src/types/detection';
-import type { Mode, ModeContext } from '../../src/types/modes';
+import type { Mode, ModeContext, ModeId } from '../../src/types/modes';
 
 type FormatPreference = 'auto' | 'image/jpeg' | 'image/png';
 
@@ -44,16 +47,23 @@ interface PanelState {
   detection: DetectionResult | null;
   constraints: DetectedConstraints;
   currentMode: Mode | null;
+  currentModeId: ModeId;
   currentBlob: Blob | null;
   currentFilename: string;
   preferredFormat: FormatPreference;
   jpegQuality: number;
 }
 
+const MODE_TABS: ModeTabSpec[] = [
+  { id: 'upload-crop', label: 'Crop', hint: 'from image' },
+  { id: 'create', label: 'Create', hint: 'from scratch' },
+];
+
 const state: PanelState = {
   detection: null,
   constraints: DEFAULT_CONSTRAINTS,
   currentMode: null,
+  currentModeId: 'upload-crop',
   currentBlob: null,
   currentFilename: 'inputr.png',
   preferredFormat: 'auto',
@@ -70,6 +80,7 @@ const outputBar = new OutputBar({
 });
 
 const modeHost = document.getElementById('mode-host') as HTMLElement;
+const modeTabsHost = document.getElementById('mode-tabs') as HTMLElement;
 const settingsBtn = document.getElementById(
   'open-settings',
 ) as HTMLButtonElement;
@@ -77,6 +88,16 @@ const formatSelect = document.getElementById(
   'format-select',
 ) as HTMLSelectElement;
 const filenameLabel = document.getElementById('output-filename') as HTMLElement;
+
+const modeTabs = mountModeTabs(modeTabsHost, {
+  tabs: MODE_TABS,
+  active: state.currentModeId,
+  onSelect: (id) => {
+    if (id === state.currentModeId) return;
+    state.currentModeId = id;
+    void mountMode();
+  },
+});
 
 settingsBtn.addEventListener('click', () => {
   chrome.runtime.openOptionsPage().catch(() => {
@@ -147,8 +168,12 @@ async function mountMode(): Promise<void> {
   state.currentBlob = null;
   outputBar.setEnabled(false);
   filenameLabel.textContent = '';
+  modeTabs.setActive(state.currentModeId);
 
-  const mode: Mode = new UploadCropMode();
+  const mode: Mode =
+    state.currentModeId === 'create'
+      ? new CreateMode()
+      : new UploadCropMode();
   state.currentMode = mode;
 
   const ctx: ModeContext = {

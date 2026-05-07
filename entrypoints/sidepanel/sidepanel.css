@@ -114,6 +114,72 @@ body {
   text-decoration: underline;
 }
 
+/* Mode tab strip. Sits between the detection banner and the mode body.
+   Underline-style indicator keeps the strip quiet so it never competes
+   with the detection status above it. */
+
+.ip-tabs {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--ip-border);
+  background: var(--ip-bg);
+}
+
+.ip-tab {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  padding: 10px 4px 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ip-muted);
+  text-align: left;
+  font: inherit;
+  transition: color 0.15s ease;
+}
+
+.ip-tab::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: transparent;
+  transition: background 0.15s ease;
+}
+
+.ip-tab:hover {
+  color: var(--ip-fg);
+}
+
+.ip-tab[aria-selected='true'] {
+  color: var(--ip-fg);
+}
+
+.ip-tab[aria-selected='true']::after {
+  background: var(--ip-accent);
+}
+
+.ip-tab-label {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+
+.ip-tab-hint {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ip-muted);
+}
+
 .ip-mode {
   flex: 1;
   overflow: auto;
@@ -451,6 +517,343 @@ body {
   width: 100%;
   height: 100%;
   display: block;
+}
+
+/* ── Create mode (in-panel) ──────────────────────────────────────── */
+
+.ip-cr-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.ip-cr-frame {
+  position: relative;
+  background: var(--ip-bg-card);
+  border-radius: var(--ip-radius);
+  box-shadow:
+    0 1px 1px rgba(20, 14, 4, 0.04),
+    0 6px 18px -8px rgba(20, 14, 4, 0.16);
+  overflow: hidden;
+  display: block;
+  align-self: center;
+  /* Width/height are set in pixels by the controller (fitFrame). */
+}
+
+.ip-cr-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Drag overlay sits on top of the canvas. Captures pointer events so
+   the canvas itself doesn't see them. The selection rect uses
+   percentage-based positioning relative to the overlay so it scales
+   automatically with the displayed canvas size. */
+
+.ip-cr-overlay {
+  position: absolute;
+  inset: 0;
+  cursor: default;
+  /* Keyboard focus shouldn't draw a ring around the whole canvas. */
+  outline: none;
+  touch-action: none;
+}
+
+.ip-cr-overlay.is-dragging {
+  cursor: grabbing;
+}
+
+.ip-cr-selection {
+  position: absolute;
+  border: 1.5px solid var(--ip-accent);
+  border-radius: 3px;
+  pointer-events: none;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.6) inset,
+    0 0 0 1px rgba(255, 255, 255, 0.6);
+  /* Subtle pulse on first selection so the user notices it. */
+  animation: ip-cr-select-pop 0.18s ease;
+}
+
+.ip-cr-selection[hidden] {
+  display: none;
+}
+
+@keyframes ip-cr-select-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.ip-cr-hint {
+  font-size: 11px;
+  color: var(--ip-muted);
+  text-align: center;
+  margin-top: -2px;
+}
+
+.ip-cr-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--ip-muted);
+  font-family: var(--ip-font-mono);
+  font-feature-settings: 'tnum' on;
+}
+
+.ip-cr-dot {
+  opacity: 0.5;
+}
+
+.ip-cr-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+.ip-cr-section-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--ip-border);
+}
+
+.ip-cr-section-title {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ip-fg);
+}
+
+.ip-cr-section-tag {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ip-muted);
+  margin-left: auto;
+}
+
+.ip-cr-section-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ip-cr-pills {
+  display: inline-flex;
+  background: var(--ip-bg-card);
+  border: 1px solid var(--ip-border);
+  border-radius: 999px;
+  padding: 3px;
+  align-self: flex-start;
+}
+
+.ip-cr-pill {
+  border: none;
+  background: transparent;
+  color: var(--ip-muted);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ip-cr-pill[aria-selected='true'] {
+  background: var(--ip-fg);
+  color: var(--ip-bg-card);
+}
+
+.ip-cr-pill:hover:not([aria-selected='true']) {
+  color: var(--ip-fg);
+}
+
+.ip-cr-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ip-cr-swatches {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 6px;
+}
+
+.ip-cr-swatch {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 6px;
+  border: 1px solid var(--ip-border-strong);
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.12s ease;
+}
+
+.ip-cr-swatch:hover {
+  transform: translateY(-1px);
+}
+
+.ip-cr-swatch[aria-selected='true'] {
+  box-shadow:
+    0 0 0 2px var(--ip-bg) inset,
+    0 0 0 3px var(--ip-accent);
+}
+
+.ip-cr-color-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ip-cr-color-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ip-muted);
+}
+
+.ip-cr-color {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--ip-border-strong);
+  border-radius: 6px;
+  background: none;
+  padding: 2px;
+  cursor: pointer;
+}
+
+.ip-cr-color::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.ip-cr-color::-webkit-color-swatch {
+  border: none;
+  border-radius: 4px;
+}
+
+.ip-cr-color::-moz-color-swatch {
+  border: none;
+  border-radius: 4px;
+}
+
+.ip-cr-hex {
+  font-family: var(--ip-font-mono);
+  font-size: 11px;
+  color: var(--ip-muted);
+}
+
+.ip-cr-drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: var(--ip-bg-card);
+  border: 1.5px dashed var(--ip-border-strong);
+  border-radius: var(--ip-radius);
+  padding: 16px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease;
+  position: relative;
+}
+
+.ip-cr-drop:hover,
+.ip-cr-drop.is-drag {
+  border-color: var(--ip-accent);
+  background: var(--ip-accent-soft);
+  color: var(--ip-accent);
+}
+
+.ip-cr-drop input[type='file'] {
+  display: none;
+}
+
+.ip-cr-drop-line {
+  font-weight: 600;
+  color: var(--ip-fg);
+  font-size: 13px;
+}
+
+.ip-cr-drop:hover .ip-cr-drop-line,
+.ip-cr-drop.is-drag .ip-cr-drop-line {
+  color: var(--ip-accent);
+}
+
+.ip-cr-drop-sub {
+  font-size: 11px;
+  color: var(--ip-muted);
+}
+
+.ip-cr-drop.is-loaded .ip-cr-drop-line,
+.ip-cr-drop.is-loaded .ip-cr-drop-sub {
+  display: none;
+}
+
+.ip-cr-drop-loaded {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--ip-fg);
+}
+
+.ip-cr-drop-loaded[hidden] {
+  display: none;
+}
+
+.ip-cr-drop-clear {
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--ip-accent);
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  text-decoration: underline;
+}
+
+.ip-cr-drop-clear:hover {
+  color: var(--ip-accent-hover);
+}
+
+.ip-cr-text-input {
+  width: 100%;
+  height: 38px;
+  background: var(--ip-bg-card);
+  border: 1px solid var(--ip-border);
+  border-radius: var(--ip-radius);
+  padding: 0 12px;
+  color: var(--ip-fg);
+  font: inherit;
+  font-size: 13px;
+  transition: border-color 0.15s ease;
+}
+
+.ip-cr-text-input:focus {
+  outline: none;
+  border-color: var(--ip-accent);
+}
+
+.ip-cr-text-input::placeholder {
+  color: var(--ip-muted);
 }
 
 /* Toast */

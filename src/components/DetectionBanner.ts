@@ -18,6 +18,12 @@
  * without losing the loaded image.
  */
 
+import {
+  CUSTOM_PRESET_ID as CUSTOM_ID,
+  findPreset,
+  SIZE_PRESETS as PRESETS,
+  type SizePreset as Preset,
+} from '../lib/presets';
 import type {
   DetectedConstraints,
   DetectionResult,
@@ -29,30 +35,6 @@ interface MountOpts {
   onOverride: (next: DetectedConstraints) => void;
   onRescan: () => void | Promise<void>;
 }
-
-interface Preset {
-  id: string;
-  label: string;
-  width: number;
-  height: number;
-  /** Max file size in MB. */
-  sizeMB: number;
-}
-
-const CUSTOM_ID = 'custom';
-
-const PRESETS: Preset[] = [
-  { id: 'linkedin-banner', label: 'LinkedIn banner', width: 1584, height: 396, sizeMB: 8 },
-  { id: 'linkedin-post', label: 'LinkedIn post', width: 1200, height: 627, sizeMB: 5 },
-  { id: 'profile-pic', label: 'Profile picture (square)', width: 512, height: 512, sizeMB: 2 },
-  { id: 'x-banner', label: 'X / Twitter banner', width: 1500, height: 500, sizeMB: 5 },
-  { id: 'x-post', label: 'X / Twitter post', width: 1600, height: 900, sizeMB: 5 },
-  { id: 'ig-square', label: 'Instagram square', width: 1080, height: 1080, sizeMB: 5 },
-  { id: 'ig-story', label: 'Instagram story / reel', width: 1080, height: 1920, sizeMB: 5 },
-  { id: 'yt-thumb', label: 'YouTube thumbnail', width: 1280, height: 720, sizeMB: 2 },
-  { id: 'yt-banner', label: 'YouTube banner', width: 2560, height: 1440, sizeMB: 6 },
-  { id: 'og-share', label: 'Social share (OG)', width: 1200, height: 630, sizeMB: 5 },
-];
 
 const COMMIT_DEBOUNCE_MS = 250;
 const MIN_PX = 8;
@@ -234,7 +216,7 @@ export function mountDetectionBanner(
 }
 
 function findMatchingPreset(c: DetectedConstraints): Preset | null {
-  return PRESETS.find((p) => p.width === c.width && p.height === c.height) ?? null;
+  return findPreset(c.width, c.height);
 }
 
 function sameAs(a: DetectedConstraints, b: DetectedConstraints): boolean {
