@@ -1,21 +1,19 @@
 /**
  * Detection / target panel.
  *
- * Auto-detection runs on every page load via the content script. When
- * it succeeds, the detected dimensions land in the inputs and the
- * matching preset (if any) gets selected. When it fails, the user
- * picks from a preset or types custom values.
+ * Renders as a collapsible block: a single summary line with the
+ * current target ("● 1200 × 630 · 10 MB · OG share"), and a body that
+ * holds the editable controls (preset, width/height, size slider,
+ * auto-detect button).
  *
- * Layout, top to bottom:
- *   - Status line ("Auto-detected: LinkedIn banner" / "No site detected")
- *   - Preset dropdown with the common upload targets
- *   - Width and Height pixel inputs (free-typing flips preset to Custom)
- *   - Max file size slider (100 KB → 20 MB)
- *   - "Auto detect" button to re-run detection on the current page
+ * Default behaviour: collapsed when detection succeeded (the summary
+ * already tells the user what they have), expanded when no detection
+ * (so they know to pick a preset or set values). Click the summary to
+ * toggle, the same way `<details>` works elsewhere.
  *
  * Every change is debounced and pushed via onOverride, which routes
- * through Mode.updateConstraints so the live cropper retargets in place
- * without losing the loaded image.
+ * through Mode.updateConstraints so the live cropper retargets in
+ * place without losing the loaded image.
  */
 
 import {
@@ -51,24 +49,39 @@ export function mountDetectionBanner(
 
   const startMatch = findMatchingPreset(opts.constraints);
 
-  // ── Status line ──────────────────────────────────────────
-  const status = document.createElement('div');
-  status.className = 'ip-detect-status';
+  // ── Collapsible shell ────────────────────────────────────────────
+  // Use a native <details> so toggle, keyboard, and focus all come
+  // for free. The summary holds the "current target" one-liner.
+  const details = document.createElement('details');
+  details.className = 'ip-detect';
+  details.open = !opts.detection?.detected;
+
+  const summary = document.createElement('summary');
+  summary.className = 'ip-detect-summary';
+
   const dot = document.createElement('span');
   dot.className = 'ip-detect-dot';
-  const text = document.createElement('span');
-  if (opts.detection?.detected) {
-    dot.classList.add('is-on');
-    const label = opts.constraints.label ?? 'page constraints';
-    text.innerHTML = `Auto-detected: <strong></strong>`;
-    text.querySelector('strong')!.textContent = label;
-  } else {
-    text.textContent = 'No site detected. Pick a preset or set custom values.';
-  }
-  status.append(dot, text);
-  root.appendChild(status);
+  if (opts.detection?.detected) dot.classList.add('is-on');
 
-  // ── Preset row ────────────────────────────────────────────
+  const summaryText = document.createElement('span');
+  summaryText.className = 'ip-detect-text';
+
+  const chevron = document.createElement('span');
+  chevron.className = 'ip-detect-chevron';
+  chevron.setAttribute('aria-hidden', 'true');
+  // Plain glyph that the CSS rotates on `details[open]`.
+  chevron.textContent = '⌃';
+
+  summary.append(dot, summaryText, chevron);
+  details.appendChild(summary);
+
+  const body = document.createElement('div');
+  body.className = 'ip-detect-body';
+  details.appendChild(body);
+
+  root.appendChild(details);
+
+  // ── Preset row ──────────────────────────────────────────────────
   const presetWrap = document.createElement('label');
   presetWrap.className = 'ip-control';
   const presetLabel = document.createElement('span');
@@ -90,14 +103,14 @@ export function mountDetectionBanner(
   }
   presetSel.value = startMatch?.id ?? CUSTOM_ID;
 
-  // ── Width / Height row ───────────────────────────────────
+  // ── Width / Height row ──────────────────────────────────────────
   const dimsRow = document.createElement('div');
   dimsRow.className = 'ip-row';
   const width = mkPxInput('Width', opts.constraints.width);
   const height = mkPxInput('Height', opts.constraints.height);
   dimsRow.append(width.wrapper, height.wrapper);
 
-  // ── Size slider row ──────────────────────────────────────
+  // ── Size slider row ─────────────────────────────────────────────
   const sizeWrap = document.createElement('div');
   sizeWrap.className = 'ip-control';
   const sizeHead = document.createElement('div');
@@ -126,7 +139,7 @@ export function mountDetectionBanner(
 
   sizeWrap.append(sizeHead, sizeSlider);
 
-  // ── Auto-detect button ───────────────────────────────────
+  // ── Auto-detect button ──────────────────────────────────────────
   const detectWrap = document.createElement('div');
   detectWrap.className = 'ip-detection-actions';
   const detectBtn = document.createElement('button');
@@ -139,9 +152,22 @@ export function mountDetectionBanner(
   });
   detectWrap.appendChild(detectBtn);
 
-  root.append(presetWrap, dimsRow, sizeWrap, detectWrap);
+  body.append(presetWrap, dimsRow, sizeWrap, detectWrap);
 
-  // ── Wire commits ─────────────────────────────────────────
+  // ── Summary text helper ─────────────────────────────────────────
+  // Always show the *current* target, not stale detection text. This
+  // re-runs after any commit so the collapsed header stays in sync
+  // with whatever the user has set.
+  const updateSummary = (): void => {
+    const c = opts.constraints;
+    const dims = `${c.width} × ${c.height}`;
+    const size = formatSize(Math.round(c.maxSizeBytes / 1024));
+    const labelHint = currentLabel(c, opts.detection?.detected ?? false);
+    summaryText.textContent = `${dims} · ${size} · ${labelHint}`;
+  };
+  updateSummary();
+
+  // ── Wire commits ────────────────────────────────────────────────
   let timer: number | null = null;
 
   const commit = (): void => {
@@ -162,6 +188,7 @@ export function mountDetectionBanner(
     };
     if (sameAs(opts.constraints, next)) return;
     opts.constraints = next;
+    updateSummary();
     opts.onOverride(next);
   };
 
@@ -182,6 +209,9 @@ export function mountDetectionBanner(
     height.input.value = String(p.height);
     sizeSlider.value = String(p.sizeMB * 1024);
     sizeValue.textContent = formatSize(Number(sizeSlider.value));
+    // Update label to the picked preset so the summary reflects it
+    // even when collapsed.
+    opts.constraints = { ...opts.constraints, label: p.label };
     if (timer !== null) clearTimeout(timer);
     timer = null;
     commit();
@@ -198,11 +228,9 @@ export function mountDetectionBanner(
   // Size slider live updates the value label and commits debounced.
   sizeSlider.addEventListener('input', () => {
     sizeValue.textContent = formatSize(Number(sizeSlider.value));
-    // Editing the size doesn't change dimensions, so don't flip preset.
     debounceCommit();
   });
 
-  // Flush on blur so leaving the field always settles.
   const flush = (): void => {
     if (timer !== null) {
       clearTimeout(timer);
@@ -213,6 +241,15 @@ export function mountDetectionBanner(
   width.input.addEventListener('blur', flush);
   height.input.addEventListener('blur', flush);
   sizeSlider.addEventListener('change', flush);
+}
+
+/** Pick the most informative label to show in the collapsed summary. */
+function currentLabel(c: DetectedConstraints, detected: boolean): string {
+  if (detected && c.label) return c.label;
+  const preset = findPreset(c.width, c.height);
+  if (preset) return preset.label;
+  if (c.label) return c.label;
+  return 'Custom';
 }
 
 function findMatchingPreset(c: DetectedConstraints): Preset | null {

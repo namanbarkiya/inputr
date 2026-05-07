@@ -84,14 +84,14 @@ body {
   color: var(--ip-accent);
 }
 
+/* The detection block now wraps a <details>; the section is just a
+   border-bottom and color reset. All padding lives on the summary /
+   body so the click target reaches edge-to-edge. */
 .ip-detection {
-  padding: 10px 16px;
+  padding: 0;
   border-bottom: 1px solid var(--ip-border);
   font-size: 13px;
   color: var(--ip-muted);
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
 }
 
 .ip-detection strong {
@@ -102,6 +102,71 @@ body {
 .ip-detection-actions {
   display: flex;
   gap: 8px;
+}
+
+/* Collapsible <details> wrapper. */
+.ip-detect {
+  width: 100%;
+}
+
+.ip-detect-summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 13px;
+  color: var(--ip-fg);
+  transition: background 0.12s ease;
+}
+
+.ip-detect-summary::-webkit-details-marker {
+  display: none;
+}
+
+.ip-detect-summary:hover {
+  background: rgba(253, 109, 44, 0.04);
+}
+
+.ip-detect-summary:focus-visible {
+  outline: 2px solid var(--ip-accent);
+  outline-offset: -2px;
+  border-radius: var(--ip-radius);
+}
+
+.ip-detect-text {
+  flex: 1;
+  font-feature-settings: 'tnum' on;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ip-detect-chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  color: var(--ip-muted);
+  font-size: 14px;
+  line-height: 1;
+  transform: rotate(180deg);
+  transition: transform 0.18s ease;
+}
+
+.ip-detect[open] > .ip-detect-summary .ip-detect-chevron {
+  transform: rotate(0);
+}
+
+.ip-detect-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 4px 16px 14px;
 }
 
 .ip-link-btn {
@@ -378,21 +443,7 @@ body {
   border-radius: 999px;
 }
 
-/* Detection status line: "● Auto-detected: LinkedIn banner" */
-
-.ip-detect-status {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  color: var(--ip-muted);
-  padding: 2px 0 2px;
-}
-
-.ip-detect-status strong {
-  color: var(--ip-fg);
-  font-weight: 600;
-}
+/* Status dot used in the collapsible summary header. */
 
 .ip-detect-dot {
   width: 7px;
