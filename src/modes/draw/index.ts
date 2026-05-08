@@ -169,6 +169,9 @@ export class DrawMode implements Mode {
     }
     this.ui.frame.style.width = `${Math.round(dispW)}px`;
     this.ui.frame.style.height = `${Math.round(dispH)}px`;
+    // Selection / marquee divs are positioned in display pixels, so
+    // they need to be reflowed after the frame is resized.
+    this.ui.fitFrame();
   }
 }
 

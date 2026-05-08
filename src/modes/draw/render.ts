@@ -24,9 +24,12 @@ export const DRAW_FONT =
 
 export interface PaintOptions {
   background: string;
-  selectedId: string | null;
 }
 
+/** Paint shapes onto the canvas. Selection visuals are rendered in the
+ *  DOM (overlay divs) rather than on the canvas itself, so the canvas
+ *  bytes are always export-clean — copy/download never include the
+ *  selection bbox. */
 export function paintAll(
   canvas: HTMLCanvasElement,
   shapes: Shape[],
@@ -43,11 +46,6 @@ export function paintAll(
   ctx.fillRect(0, 0, width, height);
 
   for (const s of shapes) paintShape(ctx, s);
-
-  if (opts.selectedId) {
-    const target = shapes.find((s) => s.id === opts.selectedId);
-    if (target) paintSelection(ctx, target);
-  }
 }
 
 function paintShape(ctx: CanvasRenderingContext2D, s: Shape): void {
@@ -166,40 +164,6 @@ function paintText(ctx: CanvasRenderingContext2D, s: TextShape): void {
   for (const [i, line] of s.text.split('\n').entries()) {
     ctx.fillText(line, s.x, s.y + i * s.size * 1.2);
   }
-}
-
-function paintSelection(ctx: CanvasRenderingContext2D, s: Shape): void {
-  const b = boundingBox(s);
-  if (!b) return;
-  // Pad outward by stroke half so the selection sits outside the
-  // glyph rather than clipping into it.
-  const pad = Math.max(4, s.strokeWidth);
-  const x = b.x - pad;
-  const y = b.y - pad;
-  const w = b.w + pad * 2;
-  const h = b.h + pad * 2;
-
-  ctx.save();
-  ctx.strokeStyle = '#fd6d2c';
-  ctx.fillStyle = '#fd6d2c';
-  ctx.lineWidth = 1.5;
-  ctx.setLineDash([6, 4]);
-  ctx.strokeRect(x, y, w, h);
-  ctx.setLineDash([]);
-
-  // Tiny corner ticks so the selection reads as a bounding box.
-  const r = 2.5;
-  for (const [cx, cy] of [
-    [x, y],
-    [x + w, y],
-    [x, y + h],
-    [x + w, y + h],
-  ]) {
-    ctx.beginPath();
-    ctx.arc(cx, cy, r, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  ctx.restore();
 }
 
 /** Bounding box of a shape in canvas-pixel coordinates. Returns null
@@ -337,6 +301,20 @@ function distSqPointToSegment(
   const cx = ax + t * dx;
   const cy = ay + t * dy;
   return (px - cx) ** 2 + (py - cy) ** 2;
+}
+
+/** Returns true when the shape's bbox overlaps the given AABB. Used
+ *  for marquee-rectangle (rubber-band) multi-selection — any shape
+ *  the marquee touches gets included. */
+export function shapeIntersectsRect(s: Shape, r: AABB): boolean {
+  const b = boundingBox(s);
+  if (!b) return false;
+  return !(
+    b.x + b.w < r.x ||
+    b.x > r.x + r.w ||
+    b.y + b.h < r.y ||
+    b.y > r.y + r.h
+  );
 }
 
 /** Shift a shape's spatial coords by (dx, dy). Returns a new shape; the

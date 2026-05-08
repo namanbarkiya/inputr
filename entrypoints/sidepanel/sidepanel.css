@@ -1147,6 +1147,37 @@ body {
   display: none;
 }
 
+/* Selection and marquee overlays. Both live above the canvas in DOM
+   so the canvas itself stays export-clean (copy and download never
+   include the dashed bbox). */
+
+.ip-dr-selection-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.ip-dr-sel-rect {
+  position: absolute;
+  border: 1.5px dashed var(--ip-accent);
+  border-radius: 3px;
+  background: rgba(253, 109, 44, 0.04);
+}
+
+.ip-dr-marquee {
+  position: absolute;
+  border: 1px dashed var(--ip-accent);
+  background: rgba(253, 109, 44, 0.08);
+  pointer-events: none;
+  z-index: 3;
+  border-radius: 2px;
+}
+
+.ip-dr-marquee[hidden] {
+  display: none;
+}
+
 /* Toast */
 
 .ip-toasts {

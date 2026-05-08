@@ -7,25 +7,33 @@
  * after a shape is added, moved, deleted, or finished editing — those
  * are the moments the controller re-exports the blob.
  *
+ * Selection is rendered as DOM overlays rather than painted onto the
+ * canvas, so canvas exports (copy / download) never include the
+ * selection bbox. A separate "selection layer" div sits on top of the
+ * canvas and holds one rect-div per selected shape, plus a marquee
+ * rect-div that's only visible during rubber-band selection.
+ *
  * Pointer flow per tool:
- *   - select: down hit-tests, then drags translate the selected shape
+ *   - select: down on a shape selects it (shift toggles in/out of the
+ *               current set), drag translates every selected shape;
+ *               down on empty area starts a marquee that selects all
+ *               shapes whose bbox the marquee touches.
  *   - pen:    down starts a new path, move appends points, up commits
  *   - rect / ellipse / arrow: down anchors corner/centre, move
  *               resizes the in-progress shape, up commits
  *   - text:   down opens an inline input overlay; commit on Enter or
  *               blur (Esc cancels)
- *
- * Smoothing for pen strokes happens at paint time inside render.ts so
- * we don't lose raw points (which the user may want to re-edit later).
  */
 
 import {
   boundingBox,
   hitTest,
   paintAll,
+  shapeIntersectsRect,
   translateShape,
 } from './render';
 import type {
+  AABB,
   ArrowShape,
   EllipseShape,
   PenShape,
@@ -86,7 +94,7 @@ interface State {
   tool: Tool;
   shapes: Shape[];
   history: Shape[][];
-  selectedId: string | null;
+  selectedIds: Set<string>;
   stroke: string;
   fill: string | null;
   strokeWidth: number;
@@ -113,7 +121,7 @@ export function renderDrawUI(
     tool: 'pen',
     shapes: [],
     history: [],
-    selectedId: null,
+    selectedIds: new Set(),
     stroke: '#1a1612',
     fill: null,
     strokeWidth: STROKE_DEFAULT,
@@ -151,7 +159,7 @@ export function renderDrawUI(
   }
   container.appendChild(toolbar);
 
-  // ── Property bar (color + stroke + utilities) ───────────────────
+  // ── Property bar ────────────────────────────────────────────────
   const props = document.createElement('div');
   props.className = 'ip-dr-props';
 
@@ -169,7 +177,6 @@ export function renderDrawUI(
     swatchRow.appendChild(sw);
     swatchEls.push(sw);
   }
-  // Custom picker.
   const customColor = document.createElement('input');
   customColor.type = 'color';
   customColor.className = 'ip-dr-color-input';
@@ -178,7 +185,6 @@ export function renderDrawUI(
   swatchRow.appendChild(customColor);
   props.appendChild(swatchRow);
 
-  // Stroke width slider + fill toggle + utility buttons.
   const propsRow = document.createElement('div');
   propsRow.className = 'ip-dr-props-row';
 
@@ -242,11 +248,21 @@ export function renderDrawUI(
   canvas.className = 'ip-dr-canvas';
   canvas.width = outputW;
   canvas.height = outputH;
-  canvas.tabIndex = 0;
   frame.appendChild(canvas);
 
-  // Inline text editor overlay (positioned absolute over the canvas
-  // when active). Hidden by default.
+  // Selection overlay layer. pointer-events:none so the clicks pass
+  // through to the canvas underneath.
+  const selectionLayer = document.createElement('div');
+  selectionLayer.className = 'ip-dr-selection-layer';
+  frame.appendChild(selectionLayer);
+
+  // Marquee rectangle, only visible during rubber-band drag.
+  const marqueeEl = document.createElement('div');
+  marqueeEl.className = 'ip-dr-marquee';
+  marqueeEl.hidden = true;
+  frame.appendChild(marqueeEl);
+
+  // Inline text editor overlay.
   const textEditor = document.createElement('input');
   textEditor.type = 'text';
   textEditor.className = 'ip-dr-text-editor';
@@ -269,14 +285,21 @@ export function renderDrawUI(
   meta.append(dimsEl, dot, sizeEl);
   container.appendChild(meta);
 
-  // ── Initial visual sync ─────────────────────────────────────────
   setTool(state.tool);
   markSwatch();
 
-  // ── Pointer handling per tool ───────────────────────────────────
+  // ── Pointer state ───────────────────────────────────────────────
   let activePointerId: number | null = null;
-  let dragStart: { x: number; y: number } | null = null;
-  let dragOffset: { x: number; y: number } | null = null;
+  /** Last pointer position during a drag, in canvas coords. Used to
+   *  compute incremental delta for shape translation. */
+  let dragLast: { x: number; y: number } | null = null;
+  /** True while the user is rubber-banding. */
+  let marqueeStart: { x: number; y: number } | null = null;
+  /** Selection captured at marquee start (so shift+drag is additive). */
+  let marqueeBaseline: Set<string> = new Set();
+  /** True when we pushed history at drag start so we don't push again
+   *  for every pointermove. */
+  let dragHistoryPushed = false;
 
   canvas.addEventListener('pointerdown', (ev) => {
     if (textEditor.hidden === false) commitText();
@@ -284,8 +307,7 @@ export function renderDrawUI(
 
     // Text mode is click-to-place; no drag, no pointer capture. We
     // also preventDefault so the canvas's default focus action
-    // doesn't fire and pull keyboard focus away from the editor we
-    // are about to show.
+    // doesn't pull keyboard focus away from the editor.
     if (state.tool === 'text') {
       ev.preventDefault();
       openTextEditor(p.x, p.y);
@@ -297,19 +319,40 @@ export function renderDrawUI(
 
     if (state.tool === 'select') {
       const hit = hitTest(state.shapes, p.x, p.y);
-      state.selectedId = hit?.id ?? null;
+      const additive = ev.shiftKey;
+
       if (hit) {
-        const b = boundingBox(hit);
-        if (b) dragOffset = { x: p.x - b.x, y: p.y - b.y };
-        dragStart = { x: p.x, y: p.y };
+        if (additive) {
+          // Toggle hit shape in / out of the current selection.
+          if (state.selectedIds.has(hit.id)) {
+            state.selectedIds.delete(hit.id);
+          } else {
+            state.selectedIds.add(hit.id);
+          }
+        } else if (!state.selectedIds.has(hit.id)) {
+          // Click on an unselected shape → replace selection.
+          state.selectedIds = new Set([hit.id]);
+        }
+        // Clicking a selected shape with no shift just keeps the
+        // selection and starts dragging the group.
+        dragLast = { x: p.x, y: p.y };
+        dragHistoryPushed = false;
+      } else {
+        // Empty area: start a marquee. Shift preserves the existing
+        // selection so the marquee adds to it.
+        if (!additive) state.selectedIds = new Set();
+        marqueeStart = { x: p.x, y: p.y };
+        marqueeBaseline = new Set(state.selectedIds);
+        showMarquee(p.x, p.y, 0, 0);
       }
-      repaint();
+      syncSelectionDOM();
       return;
     }
 
-    state.selectedId = null;
+    state.selectedIds = new Set();
+    syncSelectionDOM();
     state.draft = startShape(state.tool, p.x, p.y);
-    dragStart = { x: p.x, y: p.y };
+    dragLast = { x: p.x, y: p.y };
     repaint();
   });
 
@@ -325,27 +368,57 @@ export function renderDrawUI(
     }
     const p = canvasPos(ev);
 
-    if (state.tool === 'select' && state.selectedId && dragStart && dragOffset) {
-      const sel = state.shapes.find((s) => s.id === state.selectedId);
-      if (sel) {
-        const b = boundingBox(sel);
-        if (b) {
-          const dx = p.x - dragOffset.x - b.x;
-          const dy = p.y - dragOffset.y - b.y;
-          state.shapes = state.shapes.map((s) =>
-            s.id === state.selectedId ? translateShape(s, dx, dy) : s,
-          );
-        }
+    // Marquee rubber-band.
+    if (state.tool === 'select' && marqueeStart) {
+      const r = normaliseRect(marqueeStart.x, marqueeStart.y, p.x, p.y);
+      showMarquee(r.x, r.y, r.w, r.h);
+      const inside = new Set<string>(marqueeBaseline);
+      for (const s of state.shapes) {
+        if (shapeIntersectsRect(s, r)) inside.add(s.id);
       }
-      repaint();
+      state.selectedIds = inside;
+      syncSelectionDOM();
       return;
     }
 
-    if (state.draft && dragStart) {
+    // Group drag of selected shapes.
+    if (
+      state.tool === 'select' &&
+      state.selectedIds.size > 0 &&
+      dragLast
+    ) {
+      const dx = p.x - dragLast.x;
+      const dy = p.y - dragLast.y;
+      if (dx === 0 && dy === 0) return;
+      if (!dragHistoryPushed) {
+        pushHistory();
+        dragHistoryPushed = true;
+      }
+      state.shapes = state.shapes.map((s) =>
+        state.selectedIds.has(s.id) ? translateShape(s, dx, dy) : s,
+      );
+      dragLast = p;
+      repaint();
+      syncSelectionDOM();
+      return;
+    }
+
+    // Pen tool: append points along the move path.
+    if (state.draft?.type === 'pen' && (ev.buttons & 1) !== 0) {
+      const last = state.draft.points[state.draft.points.length - 1];
+      if (!last || Math.hypot(p.x - last.x, p.y - last.y) >= 1.5) {
+        state.draft.points.push(p);
+        repaint();
+      }
+      return;
+    }
+
+    // Other shape drafts: update endpoint.
+    if (state.draft && dragLast) {
       state.draft = updateShape(
         state.draft,
-        dragStart.x,
-        dragStart.y,
+        dragLast.x,
+        dragLast.y,
         p.x,
         p.y,
       );
@@ -363,6 +436,15 @@ export function renderDrawUI(
     }
     activePointerId = null;
 
+    // Marquee finalises whatever it had selected on the last move.
+    if (marqueeStart) {
+      hideMarquee();
+      marqueeStart = null;
+      marqueeBaseline = new Set();
+      syncSelectionDOM();
+      return;
+    }
+
     if (state.draft) {
       // Reject zero-extent drafts (a quick click without drag).
       const b = boundingBox(state.draft);
@@ -371,52 +453,24 @@ export function renderDrawUI(
         state.shapes.push(state.draft);
       }
       state.draft = null;
+      dragLast = null;
       repaint();
       commitHandler?.();
       return;
     }
 
-    if (state.tool === 'select' && dragStart) {
-      // Translate-on-move always pushed history before mutation, but
-      // we only fire commit once at drag-end.
-      const moved = dragStart;
-      const cur = activeCanvasPos(ev);
-      if (cur && (cur.x !== moved.x || cur.y !== moved.y)) {
+    if (state.tool === 'select') {
+      if (dragHistoryPushed) {
         commitHandler?.();
+        dragHistoryPushed = false;
       }
-      dragStart = null;
-      dragOffset = null;
+      dragLast = null;
     }
   }
-
-  function activeCanvasPos(ev: PointerEvent): { x: number; y: number } | null {
-    return canvasPos(ev);
-  }
-
-  // Pen requires move-collection — handled in pointermove above. For
-  // pen specifically, we want every move to push a point even when the
-  // tool dispatch above takes the shortcut path.
-  canvas.addEventListener('pointermove', (ev) => {
-    if (
-      activePointerId === ev.pointerId &&
-      state.draft?.type === 'pen' &&
-      ev.buttons & 1
-    ) {
-      const p = canvasPos(ev);
-      const last = state.draft.points[state.draft.points.length - 1];
-      if (!last || Math.hypot(p.x - last.x, p.y - last.y) >= 1.5) {
-        state.draft.points.push(p);
-        repaint();
-      }
-    }
-  });
 
   // ── Keyboard shortcuts ──────────────────────────────────────────
   function onKey(ev: KeyboardEvent): void {
-    // Don't trigger while the inline text editor is open.
     if (!textEditor.hidden) return;
-    // Don't trigger while user is typing in any input within this
-    // panel (preset dropdown / dim inputs / etc.).
     const t = ev.target as HTMLElement | null;
     if (
       t &&
@@ -424,7 +478,6 @@ export function renderDrawUI(
         t.tagName === 'TEXTAREA' ||
         t.tagName === 'SELECT')
     ) {
-      // Allow Cmd+Z everywhere for the canvas.
       if (!isUndoCombo(ev)) return;
     }
 
@@ -435,7 +488,7 @@ export function renderDrawUI(
     }
 
     if (ev.key === 'Backspace' || ev.key === 'Delete') {
-      if (state.selectedId) {
+      if (state.selectedIds.size > 0) {
         ev.preventDefault();
         deleteSelected();
       }
@@ -443,8 +496,17 @@ export function renderDrawUI(
     }
 
     if (ev.key === 'Escape') {
-      state.selectedId = null;
-      repaint();
+      state.selectedIds = new Set();
+      syncSelectionDOM();
+      return;
+    }
+
+    // Cmd/Ctrl+A → select all.
+    if ((ev.metaKey || ev.ctrlKey) && ev.key.toLowerCase() === 'a') {
+      ev.preventDefault();
+      setTool('select');
+      state.selectedIds = new Set(state.shapes.map((s) => s.id));
+      syncSelectionDOM();
       return;
     }
 
@@ -464,6 +526,69 @@ export function renderDrawUI(
   }
   document.addEventListener('keydown', onKey);
 
+  // ── Selection / marquee DOM ─────────────────────────────────────
+  /** Convert a canvas-space AABB into display-space pixel coords
+   *  relative to the frame. Used to position selection rects and the
+   *  marquee. */
+  function canvasRectToFrame(b: AABB): {
+    left: number;
+    top: number;
+    w: number;
+    h: number;
+  } | null {
+    const r = canvas.getBoundingClientRect();
+    const fr = frame.getBoundingClientRect();
+    if (r.width === 0 || r.height === 0) return null;
+    const sx = r.width / canvas.width;
+    const sy = r.height / canvas.height;
+    return {
+      left: b.x * sx + (r.left - fr.left),
+      top: b.y * sy + (r.top - fr.top),
+      w: b.w * sx,
+      h: b.h * sy,
+    };
+  }
+
+  function syncSelectionDOM(): void {
+    selectionLayer.replaceChildren();
+    if (state.selectedIds.size === 0) return;
+    for (const s of state.shapes) {
+      if (!state.selectedIds.has(s.id)) continue;
+      const b = boundingBox(s);
+      if (!b) continue;
+      const pad = Math.max(4, s.strokeWidth);
+      const padded: AABB = {
+        x: b.x - pad,
+        y: b.y - pad,
+        w: b.w + pad * 2,
+        h: b.h + pad * 2,
+      };
+      const disp = canvasRectToFrame(padded);
+      if (!disp) continue;
+      const div = document.createElement('div');
+      div.className = 'ip-dr-sel-rect';
+      div.style.left = `${disp.left}px`;
+      div.style.top = `${disp.top}px`;
+      div.style.width = `${disp.w}px`;
+      div.style.height = `${disp.h}px`;
+      selectionLayer.appendChild(div);
+    }
+  }
+
+  function showMarquee(x: number, y: number, w: number, h: number): void {
+    const disp = canvasRectToFrame({ x, y, w, h });
+    if (!disp) return;
+    marqueeEl.hidden = false;
+    marqueeEl.style.left = `${disp.left}px`;
+    marqueeEl.style.top = `${disp.top}px`;
+    marqueeEl.style.width = `${disp.w}px`;
+    marqueeEl.style.height = `${disp.h}px`;
+  }
+
+  function hideMarquee(): void {
+    marqueeEl.hidden = true;
+  }
+
   // ── Helpers ─────────────────────────────────────────────────────
   function canvasPos(ev: PointerEvent): { x: number; y: number } {
     const r = canvas.getBoundingClientRect();
@@ -480,7 +605,10 @@ export function renderDrawUI(
       btn.setAttribute('aria-pressed', String(id === tool));
     }
     canvas.style.cursor = cursorForTool(tool);
-    if (tool !== 'select') state.selectedId = null;
+    if (tool !== 'select') {
+      state.selectedIds = new Set();
+      syncSelectionDOM();
+    }
     repaint();
   }
 
@@ -489,15 +617,15 @@ export function renderDrawUI(
     if (state.fill !== null) state.fill = hex;
     customColor.value = hex;
     markSwatch();
-    if (state.selectedId) {
-      // Apply to the selected shape so colour edits are immediate.
+    if (state.selectedIds.size > 0) {
       pushHistory();
       state.shapes = state.shapes.map((s) =>
-        s.id === state.selectedId
+        state.selectedIds.has(s.id)
           ? { ...s, stroke: hex, fill: s.fill !== null ? hex : s.fill }
           : s,
       );
       repaint();
+      syncSelectionDOM();
       commitHandler?.();
     }
   }
@@ -561,10 +689,7 @@ export function renderDrawUI(
     endX: number,
     endY: number,
   ): Shape {
-    if (s.type === 'pen') {
-      // Pen is updated via the dedicated pointermove listener.
-      return s;
-    }
+    if (s.type === 'pen') return s;
     if (s.type === 'rect') {
       const x = Math.min(startX, endX);
       const y = Math.min(startY, endY);
@@ -589,7 +714,6 @@ export function renderDrawUI(
 
   function pushHistory(): void {
     state.history.push(state.shapes.map((s) => cloneShape(s)));
-    // Cap history at 50 entries to keep memory bounded.
     if (state.history.length > 50) state.history.shift();
   }
 
@@ -597,8 +721,9 @@ export function renderDrawUI(
     const prev = state.history.pop();
     if (!prev) return;
     state.shapes = prev;
-    state.selectedId = null;
+    state.selectedIds = new Set();
     repaint();
+    syncSelectionDOM();
     commitHandler?.();
   }
 
@@ -606,17 +731,19 @@ export function renderDrawUI(
     if (state.shapes.length === 0) return;
     pushHistory();
     state.shapes = [];
-    state.selectedId = null;
+    state.selectedIds = new Set();
     repaint();
+    syncSelectionDOM();
     commitHandler?.();
   }
 
   function deleteSelected(): void {
-    if (!state.selectedId) return;
+    if (state.selectedIds.size === 0) return;
     pushHistory();
-    state.shapes = state.shapes.filter((s) => s.id !== state.selectedId);
-    state.selectedId = null;
+    state.shapes = state.shapes.filter((s) => !state.selectedIds.has(s.id));
+    state.selectedIds = new Set();
     repaint();
+    syncSelectionDOM();
     commitHandler?.();
   }
 
@@ -624,8 +751,9 @@ export function renderDrawUI(
     const list = state.draft ? [...state.shapes, state.draft] : state.shapes;
     paintAll(canvas, list, outputW, outputH, {
       background: opts.background,
-      selectedId: state.selectedId,
     });
+    // Selection rects sit in DOM and need to follow shape mutations.
+    syncSelectionDOM();
   }
 
   // ── Inline text editor ──────────────────────────────────────────
@@ -634,25 +762,17 @@ export function renderDrawUI(
 
   function openTextEditor(x: number, y: number): void {
     textTarget = { x, y };
-    // Position the editor at the click point in display coords.
     const r = canvas.getBoundingClientRect();
     const fr = frame.getBoundingClientRect();
     const px = ((x / outputW) * r.width) + (r.left - fr.left);
     const py = ((y / outputH) * r.height) + (r.top - fr.top);
     textEditor.hidden = false;
     textEditor.value = '';
-    // Display size relative to canvas display ratio so the editor
-    // looks roughly the size of the resulting text.
     const dispSize = state.textSize * (r.height / outputH);
     textEditor.style.left = `${Math.max(2, px)}px`;
     textEditor.style.top = `${Math.max(2, py)}px`;
     textEditor.style.fontSize = `${Math.max(11, dispSize)}px`;
     textEditor.style.color = state.stroke;
-    // Defer focus so the click's default action (which focuses the
-    // canvas because of tabindex) runs first. Without this defer the
-    // canvas steals focus right after we set it on the editor, the
-    // editor's blur handler fires, and the editor closes before the
-    // user can type a character.
     suppressNextBlurCommit = true;
     setTimeout(() => {
       textEditor.focus();
@@ -712,7 +832,11 @@ export function renderDrawUI(
     onCommit(handler) {
       commitHandler = handler;
     },
-    fitFrame: () => {},
+    fitFrame: () => {
+      // Selection divs depend on the canvas display size; resync after
+      // the controller resizes the frame.
+      syncSelectionDOM();
+    },
     setDimensions(width, height) {
       outputW = width;
       outputH = height;
@@ -758,4 +882,18 @@ function isUndoCombo(ev: KeyboardEvent): boolean {
 
 function newId(): string {
   return `s_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`;
+}
+
+function normaliseRect(
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+): AABB {
+  return {
+    x: Math.min(x1, x2),
+    y: Math.min(y1, y2),
+    w: Math.abs(x2 - x1),
+    h: Math.abs(y2 - y1),
+  };
 }
