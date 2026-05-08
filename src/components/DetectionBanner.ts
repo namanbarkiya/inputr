@@ -54,7 +54,9 @@ export function mountDetectionBanner(
   // for free. The summary holds the "current target" one-liner.
   const details = document.createElement('details');
   details.className = 'ip-detect';
-  details.open = !opts.detection?.detected;
+  // Always start collapsed. The summary line shows the current
+  // target, which is the only thing most users need to glance at.
+  details.open = false;
 
   const summary = document.createElement('summary');
   summary.className = 'ip-detect-summary';

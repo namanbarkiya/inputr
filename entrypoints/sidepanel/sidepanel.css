@@ -907,6 +907,246 @@ body {
   color: var(--ip-muted);
 }
 
+/* ── Draw mode (in-panel) ────────────────────────────────────────── */
+
+.ip-dr-toolbar {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--ip-bg-card);
+  border: 1px solid var(--ip-border);
+  border-radius: 999px;
+  align-self: center;
+}
+
+.ip-dr-tool {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--ip-muted);
+  border-radius: 999px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease;
+}
+
+.ip-dr-tool svg {
+  width: 18px;
+  height: 18px;
+}
+
+.ip-dr-tool:hover {
+  color: var(--ip-fg);
+  background: var(--ip-bg);
+}
+
+.ip-dr-tool[aria-pressed='true'] {
+  background: var(--ip-fg);
+  color: var(--ip-bg-card);
+}
+
+.ip-dr-props {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ip-dr-swatches {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.ip-dr-swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid var(--ip-border-strong);
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.12s ease;
+}
+
+.ip-dr-swatch:hover {
+  transform: scale(1.1);
+}
+
+.ip-dr-swatch[aria-selected='true'] {
+  box-shadow:
+    0 0 0 2px var(--ip-bg) inset,
+    0 0 0 2px var(--ip-accent);
+}
+
+.ip-dr-color-input {
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--ip-border-strong);
+  border-radius: 50%;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  margin-left: 2px;
+}
+
+.ip-dr-color-input::-webkit-color-swatch-wrapper {
+  padding: 0;
+  border-radius: 50%;
+}
+
+.ip-dr-color-input::-webkit-color-swatch {
+  border: none;
+  border-radius: 50%;
+}
+
+.ip-dr-color-input::-moz-color-swatch {
+  border: none;
+  border-radius: 50%;
+}
+
+.ip-dr-props-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ip-dr-width {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--ip-bg-card);
+  border: 1px solid var(--ip-border);
+  border-radius: 999px;
+  padding: 4px 14px;
+  min-width: 0;
+}
+
+.ip-dr-width-label {
+  font-size: 11px;
+  color: var(--ip-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+
+.ip-dr-width-range {
+  flex: 1;
+  margin: 0;
+  min-width: 0;
+}
+
+.ip-dr-fill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 30px;
+  padding: 0 12px;
+  background: var(--ip-bg-card);
+  border: 1px solid var(--ip-border);
+  border-radius: 999px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ip-muted);
+  cursor: pointer;
+  transition:
+    color 0.12s ease,
+    background 0.12s ease,
+    border-color 0.12s ease;
+}
+
+.ip-dr-fill-btn:hover {
+  color: var(--ip-fg);
+}
+
+.ip-dr-fill-btn.is-on {
+  background: var(--ip-fg);
+  border-color: var(--ip-fg);
+  color: var(--ip-bg-card);
+}
+
+.ip-dr-fill-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  display: inline-block;
+}
+
+.ip-dr-icon-btn {
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--ip-border);
+  background: var(--ip-bg-card);
+  color: var(--ip-muted);
+  border-radius: 999px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition:
+    color 0.12s ease,
+    border-color 0.12s ease;
+}
+
+.ip-dr-icon-btn:hover {
+  color: var(--ip-accent);
+  border-color: var(--ip-accent);
+}
+
+.ip-dr-icon-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.ip-dr-frame {
+  position: relative;
+  background: var(--ip-bg-card);
+  border-radius: var(--ip-radius);
+  box-shadow:
+    0 1px 1px rgba(20, 14, 4, 0.04),
+    0 6px 18px -8px rgba(20, 14, 4, 0.16);
+  overflow: hidden;
+  align-self: center;
+  /* Width and height are pixel-set by the controller's fitFrame. */
+}
+
+.ip-dr-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  outline: none;
+  /* Cursor is set by JS based on the active tool. */
+}
+
+.ip-dr-text-editor {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1.5px solid var(--ip-accent);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-family: var(--ip-font);
+  font-weight: 500;
+  outline: none;
+  min-width: 80px;
+  max-width: 80%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  z-index: 5;
+}
+
+.ip-dr-text-editor[hidden] {
+  display: none;
+}
+
 /* Toast */
 
 .ip-toasts {

@@ -32,6 +32,7 @@ import { log } from '../../src/lib/logger';
 import { sendMessage } from '../../src/lib/messaging';
 import { loadDetection, loadSettings } from '../../src/lib/storage';
 import { CreateMode } from '../../src/modes/create';
+import { DrawMode } from '../../src/modes/draw';
 import { UploadCropMode } from '../../src/modes/upload-crop';
 import {
   DEFAULT_CONSTRAINTS,
@@ -57,6 +58,7 @@ interface PanelState {
 const MODE_TABS: ModeTabSpec[] = [
   { id: 'upload-crop', label: 'Crop', hint: 'from image' },
   { id: 'create', label: 'Create', hint: 'from scratch' },
+  { id: 'draw', label: 'Draw', hint: 'sketch tools' },
 ];
 
 const state: PanelState = {
@@ -162,6 +164,18 @@ function resolveFormat(): ImageFormat {
   );
 }
 
+function createMode(id: ModeId): Mode {
+  switch (id) {
+    case 'create':
+      return new CreateMode();
+    case 'draw':
+      return new DrawMode();
+    case 'upload-crop':
+    default:
+      return new UploadCropMode();
+  }
+}
+
 async function mountMode(): Promise<void> {
   state.currentMode?.destroy();
   modeHost.replaceChildren();
@@ -170,10 +184,7 @@ async function mountMode(): Promise<void> {
   filenameLabel.textContent = '';
   modeTabs.setActive(state.currentModeId);
 
-  const mode: Mode =
-    state.currentModeId === 'create'
-      ? new CreateMode()
-      : new UploadCropMode();
+  const mode: Mode = createMode(state.currentModeId);
   state.currentMode = mode;
 
   const ctx: ModeContext = {

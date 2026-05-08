@@ -8,7 +8,7 @@
 
 import type { DetectedConstraints, ImageFormat } from './detection';
 
-export type ModeId = 'upload-crop' | 'create';
+export type ModeId = 'upload-crop' | 'create' | 'draw';
 
 export interface ModeContext {
   /** The container element where the mode mounts its UI. */
