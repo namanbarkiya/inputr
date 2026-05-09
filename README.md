@@ -15,11 +15,18 @@ dance into a sidebar that lives in the same tab.
 
 ## What ships in v0.1
 
-Building in public, feature by feature. v0.1 ships **Upload + Crop**:
+Three modes, all locked to the detected (or chosen) target dimensions and
+size budget.
 
-- Drop the image you have. Inputr auto-crops to the detected aspect ratio,
-  auto-compresses to the size budget, and auto-converts to a format the
-  site accepts.
+- **Crop** — drop an image, frame the crop, get a perfectly sized output.
+  Auto-compresses to the size budget and auto-converts to an accepted
+  format.
+- **Create** — drop a background image or pick a color, drop your logo,
+  type one line of text. Drag logo and text on the preview to position.
+  Composed at the exact target dimensions.
+- **Draw** — quick whiteboard for diagrams, workflows, and annotations.
+  Pen, rectangle, ellipse, arrow, text, with multi-select via shift-click
+  or marquee drag, group move, group delete, undo, and clear.
 
 Three output paths, available on every result:
 
@@ -31,33 +38,41 @@ Three output paths, available on every result:
   directly. Falls back to clipboard with a clear toast if the site blocks
   programmatic insertion.
 
-### Coming next
-
-- **Create** — background, text, optional logo, composed onto a canvas at
-  the exact target dimensions.
-- **Draw** — sketch on a canvas locked to the target size.
-
 ## Install
+
+### From a release zip (recommended)
+
+1. Grab the latest zip from the [Releases page](https://github.com/namanbarkiya/inputr/releases).
+   Pick `inputr-<version>-chrome.zip` for Chrome / Edge / Brave / Arc, or
+   `inputr-<version>-firefox.zip` for Firefox.
+2. Unzip it.
+3. **Chrome / Edge / Brave / Arc:** open `chrome://extensions`, turn on
+   **Developer mode**, click **Load unpacked**, and pick the unzipped
+   folder.
+4. **Firefox:** open `about:debugging#/runtime/this-firefox`, click **Load
+   Temporary Add-on**, and pick the `manifest.json` inside the unzipped
+   folder.
+
+Pin the toolbar icon and click it on any page with an upload box. The side
+panel opens with the detected target.
 
 ### From source (dev)
 
 ```bash
 npm install
-npm run dev    # launches Chrome with the extension loaded
+npm run dev          # Chrome dev mode with hot reload
+npm run dev:firefox  # Firefox dev mode
 ```
 
-### From a release build
+### Build your own zip
 
 ```bash
-npm run build
-npm run zip    # produces inputr-<version>-chrome.zip
+npm install
+npm run zip          # inputr-<version>-chrome.zip
+npm run zip:firefox  # inputr-<version>-firefox.zip
 ```
 
-Then in Chrome:
-
-1. Open `chrome://extensions`
-2. Enable "Developer mode"
-3. Drag the zip onto the page (or click "Load unpacked" and pick `.output/chrome-mv3`)
+Output lands in `.output/`.
 
 ## Supported sites (v1)
 
