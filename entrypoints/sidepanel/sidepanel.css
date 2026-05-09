@@ -1126,6 +1126,13 @@ body {
   height: 100%;
   outline: none;
   /* Cursor is set by JS based on the active tool. */
+  /* Block browser gestures (scroll, pinch, two-finger swipe) so the
+     full pointer stream reaches our handlers. Without this, drag-to-
+     marquee on a sidepanel can be hijacked by the side panel's own
+     scroll behaviour. */
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .ip-dr-text-editor {

@@ -249,13 +249,56 @@ export function hitTest(
 }
 
 function hitShape(s: Shape, x: number, y: number): boolean {
-  // Use the bounding box for everything except pen, which would be too
-  // forgiving across long strokes.
   if (s.type === 'pen') return hitPen(s, x, y);
   if (s.type === 'arrow') return hitArrow(s, x, y);
+  if (s.type === 'rect') return hitRect(s, x, y);
+  if (s.type === 'ellipse') return hitEllipse(s, x, y);
+  // Text uses bbox — text glyphs effectively fill their box, no
+  // empty-interior surprise.
   const b = boundingBox(s);
   if (!b) return false;
   return x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h;
+}
+
+/** Stroke-only rects only hit on the perimeter so dragging from
+ *  inside a hollow box can start a marquee. Filled rects hit
+ *  everywhere (the fill is solid). */
+function hitRect(s: RectShape, x: number, y: number): boolean {
+  const b = boundingBox(s);
+  if (!b) return false;
+  const inside =
+    x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h;
+  if (!inside) return false;
+  if (s.fill !== null) return true;
+  // Stroke-only: hit zone is a band of `tolerance` either side of the
+  // edge. Inside the band → hit. Inside the inner empty area → miss.
+  const tol = Math.max(6, s.strokeWidth * 1.5);
+  const innerX = b.x + tol;
+  const innerY = b.y + tol;
+  const innerR = b.x + b.w - tol;
+  const innerB = b.y + b.h - tol;
+  const inEmptyInterior =
+    x > innerX && x < innerR && y > innerY && y < innerB;
+  return !inEmptyInterior;
+}
+
+/** Same idea as hitRect but for ellipses: stroke-only ellipses only
+ *  hit on the ring. */
+function hitEllipse(s: EllipseShape, x: number, y: number): boolean {
+  const dx = (x - s.cx) / Math.max(1, Math.abs(s.rx));
+  const dy = (y - s.cy) / Math.max(1, Math.abs(s.ry));
+  const norm = dx * dx + dy * dy;
+  if (norm > 1) return false;
+  if (s.fill !== null) return true;
+  const tol = Math.max(6, s.strokeWidth * 1.5);
+  // Inner radius for the empty-interior test, in "normalised" units.
+  const innerRx = Math.max(0, Math.abs(s.rx) - tol);
+  const innerRy = Math.max(0, Math.abs(s.ry) - tol);
+  if (innerRx <= 0 || innerRy <= 0) return true;
+  const idx = (x - s.cx) / innerRx;
+  const idy = (y - s.cy) / innerRy;
+  const inEmptyInterior = idx * idx + idy * idy < 1;
+  return !inEmptyInterior;
 }
 
 function hitPen(s: PenShape, x: number, y: number): boolean {
