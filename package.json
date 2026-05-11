@@ -53,7 +53,7 @@
     "cropperjs": "^2.0.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "^19.6.1",
+    "@commitlint/cli": "^21.0.0",
     "@commitlint/config-conventional": "^19.6.0",
     "@playwright/test": "^1.49.1",
     "@types/chrome": "^0.0.287",
