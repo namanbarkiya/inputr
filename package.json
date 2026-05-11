@@ -54,7 +54,7 @@
   },
   "devDependencies": {
     "@commitlint/cli": "^19.6.1",
-    "@commitlint/config-conventional": "^19.6.0",
+    "@commitlint/config-conventional": "^21.0.0",
     "@playwright/test": "^1.49.1",
     "@types/chrome": "^0.0.287",
     "@types/node": "^22.10.5",
