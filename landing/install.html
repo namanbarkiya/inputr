@@ -1,0 +1,696 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#fd6d2c" />
+    <meta name="color-scheme" content="light" />
+
+    <title>Install Inputr. Ninety seconds, one zip.</title>
+    <meta
+      name="description"
+      content="Install the Inputr Chrome extension from the v0.1.0 release. Download the zip, unzip, load unpacked. Five clicks, done."
+    />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://inputr.vercel.app/install" />
+    <meta property="og:site_name" content="Inputr" />
+    <meta property="og:title" content="Install Inputr. Ninety seconds, one zip." />
+    <meta
+      property="og:description"
+      content="Download the v0.1.0 zip, side-load into Chrome. Five clicks. MIT licensed, local forever."
+    />
+    <meta
+      property="og:image"
+      content="https://inputr.vercel.app/inputr_og.png"
+    />
+    <meta property="og:image:width" content="2000" />
+    <meta property="og:image:height" content="2000" />
+    <meta
+      property="og:image:alt"
+      content="Inputr. Install guide for the Chrome extension."
+    />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Install Inputr. Ninety seconds, one zip." />
+    <meta
+      name="twitter:description"
+      content="Download the v0.1.0 zip, side-load into Chrome. Five clicks."
+    />
+    <meta
+      name="twitter:image"
+      content="https://inputr.vercel.app/inputr_og.png"
+    />
+    <meta
+      name="twitter:image:alt"
+      content="Inputr. Install guide for the Chrome extension."
+    />
+
+    <meta name="author" content="Naman Barkiya" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin="anonymous"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="./favicon-32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="./favicon-16.png"
+    />
+    <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
+    <link rel="shortcut icon" href="./favicon-32.png" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+
+  <body class="page-install">
+    <a href="#main" class="skip">Skip to content</a>
+
+    <header class="nav">
+      <a class="nav-brand" href="/" aria-label="Inputr home">
+        <img src="./logo.svg" alt="Inputr" class="nav-logo" />
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="/#how">How it works</a>
+        <a href="/#modes">Modes</a>
+        <a href="/#sites">Sites</a>
+        <a href="/#privacy">Privacy</a>
+      </nav>
+      <div class="nav-actions">
+        <a
+          class="nav-link"
+          href="https://github.com/namanbarkiya/inputr"
+          target="_blank"
+          rel="noopener"
+          aria-label="View Inputr on GitHub"
+        >
+          GitHub
+        </a>
+        <a
+          class="btn btn-primary"
+          href="https://github.com/namanbarkiya/inputr/releases/download/v0.1.0/inputr-0.1.0-chrome.zip"
+          download
+        >
+          Download .zip
+        </a>
+      </div>
+    </header>
+
+    <main id="main">
+      <!-- ========================================================
+           INSTALL HERO
+           ======================================================== -->
+      <section class="install-hero">
+        <p class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          v0.1.0 &nbsp;·&nbsp; Chrome / Chromium &nbsp;·&nbsp; MIT licensed
+        </p>
+
+        <h1 class="hero-title">
+          Five clicks.<br />
+          You're in.
+        </h1>
+
+        <p class="hero-sub">
+          Inputr isn't on the Chrome Web Store yet. Until v1 ships, you
+          side-load the release zip. Two minutes, end to end. No accounts,
+          no telemetry, no network calls. The extension just runs.
+        </p>
+
+        <div class="hero-cta">
+          <a
+            class="btn btn-primary btn-lg"
+            href="https://github.com/namanbarkiya/inputr/releases/download/v0.1.0/inputr-0.1.0-chrome.zip"
+            download
+          >
+            Download .zip
+            <span class="btn-arrow" aria-hidden="true">↓</span>
+          </a>
+          <a class="link-cta" href="#steps">
+            See the steps
+            <span aria-hidden="true">↓</span>
+          </a>
+        </div>
+
+        <div class="install-meta" aria-label="Release details">
+          <div class="install-meta-item">
+            <span class="install-meta-key">Release</span>
+            <span class="install-meta-val">v0.1.0</span>
+          </div>
+          <div class="install-meta-item">
+            <span class="install-meta-key">Target</span>
+            <span class="install-meta-val">Manifest V3</span>
+          </div>
+          <div class="install-meta-item">
+            <span class="install-meta-key">Browsers</span>
+            <span class="install-meta-val">Chrome, Arc, Brave, Edge</span>
+          </div>
+          <div class="install-meta-item">
+            <span class="install-meta-key">Source</span>
+            <span class="install-meta-val">
+              <a
+                href="https://github.com/namanbarkiya/inputr"
+                target="_blank"
+                rel="noopener"
+                >github.com/namanbarkiya/inputr ↗</a
+              >
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================
+           STEPS
+           ======================================================== -->
+      <section class="install-steps" id="steps">
+        <header class="section-head">
+          <span class="kicker">Install guide</span>
+          <h2>One zip. Side-loaded. Done.</h2>
+          <p class="section-sub">
+            Chrome lets any user load an unpacked extension folder. That's
+            exactly what we're doing. Nothing here touches a remote server,
+            nothing here asks for permissions Inputr doesn't already
+            declare in its manifest.
+          </p>
+        </header>
+
+        <ol class="istep-list">
+          <!-- Step 1 -->
+          <li class="istep">
+            <div class="istep-side">
+              <span class="istep-num">01</span>
+              <span class="istep-rail" aria-hidden="true"></span>
+            </div>
+            <div class="istep-body">
+              <h3>Download the release zip.</h3>
+              <p>
+                Grab <code>inputr-0.1.0-chrome.zip</code> from the GitHub
+                release page. It's ~1 MB. The same artifact CI builds from
+                the source tree, signed only by the git commit it was built
+                from.
+              </p>
+              <a
+                class="btn btn-primary"
+                href="https://github.com/namanbarkiya/inputr/releases/download/v0.1.0/inputr-0.1.0-chrome.zip"
+                download
+              >
+                Download inputr-0.1.0-chrome.zip
+                <span class="btn-arrow" aria-hidden="true">↓</span>
+              </a>
+            </div>
+            <div class="istep-art istep-art-1" aria-hidden="true">
+              <div class="dl-card">
+                <div class="dl-card-head">
+                  <span class="dl-mark"></span>
+                  <span class="dl-name">inputr-0.1.0-chrome.zip</span>
+                  <span class="dl-size">1.2 MB</span>
+                </div>
+                <div class="dl-card-bar">
+                  <span class="dl-card-fill"></span>
+                </div>
+                <div class="dl-card-foot">
+                  <span>Released by Naman Barkiya</span>
+                  <span class="dl-card-tick">✓</span>
+                </div>
+              </div>
+            </div>
+          </li>
+
+          <!-- Step 2 -->
+          <li class="istep">
+            <div class="istep-side">
+              <span class="istep-num">02</span>
+              <span class="istep-rail" aria-hidden="true"></span>
+            </div>
+            <div class="istep-body">
+              <h3>Unzip it. Keep the folder.</h3>
+              <p>
+                Double-click the zip (macOS) or right-click and
+                <em>Extract All</em> (Windows). You'll get a folder named
+                <code>inputr-0.1.0-chrome</code>. Move it somewhere stable
+                like <code>~/Applications</code>. If you delete this folder
+                later, the extension disappears with it.
+              </p>
+              <ul class="istep-bullets">
+                <li>macOS: double-click reveals the folder in place</li>
+                <li>Windows: right-click → Extract All</li>
+                <li>Linux: <code>unzip inputr-0.1.0-chrome.zip</code></li>
+              </ul>
+            </div>
+            <div class="istep-art istep-art-2" aria-hidden="true">
+              <div class="zip-flow">
+                <div class="zip-item zip-archive">
+                  <span class="zip-icon zip-icon-archive">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </span>
+                  <span class="zip-label">inputr-0.1.0.zip</span>
+                </div>
+                <span class="zip-arrow">→</span>
+                <div class="zip-item zip-folder">
+                  <span class="zip-icon zip-icon-folder"></span>
+                  <span class="zip-label">inputr-0.1.0-chrome/</span>
+                </div>
+              </div>
+            </div>
+          </li>
+
+          <!-- Step 3 -->
+          <li class="istep">
+            <div class="istep-side">
+              <span class="istep-num">03</span>
+              <span class="istep-rail" aria-hidden="true"></span>
+            </div>
+            <div class="istep-body">
+              <h3>Open <code>chrome://extensions</code>.</h3>
+              <p>
+                Paste the URL directly into the address bar. Chrome blocks
+                links to <code>chrome://</code> URLs on purpose, so a
+                button can't take you there. Arc, Brave, and Edge accept
+                the same URL.
+              </p>
+              <button
+                class="btn btn-secondary copy-btn"
+                type="button"
+                data-copy="chrome://extensions"
+              >
+                Copy <code>chrome://extensions</code>
+                <span class="btn-arrow" aria-hidden="true">⧉</span>
+              </button>
+            </div>
+            <div class="istep-art istep-art-3" aria-hidden="true">
+              <div class="addr-mock">
+                <div class="addr-mock-bar">
+                  <span class="addr-mock-dot dot-r"></span>
+                  <span class="addr-mock-dot dot-y"></span>
+                  <span class="addr-mock-dot dot-g"></span>
+                  <span class="addr-mock-url">
+                    <span class="addr-url-scheme">chrome</span>://extensions
+                  </span>
+                  <span class="addr-mock-go">↵</span>
+                </div>
+              </div>
+            </div>
+          </li>
+
+          <!-- Step 4 -->
+          <li class="istep">
+            <div class="istep-side">
+              <span class="istep-num">04</span>
+              <span class="istep-rail" aria-hidden="true"></span>
+            </div>
+            <div class="istep-body">
+              <h3>Flip on <em>Developer mode</em>.</h3>
+              <p>
+                Top-right corner of the Extensions page. The toggle reveals
+                three new buttons: <em>Load unpacked</em>, <em>Pack
+                extension</em>, and <em>Update</em>. Inputr only needs the
+                first. Developer mode stays on across browser restarts and
+                only affects the Extensions page.
+              </p>
+            </div>
+            <div class="istep-art istep-art-4" aria-hidden="true">
+              <div class="dev-mock">
+                <span class="dev-mock-label">Developer mode</span>
+                <span class="dev-mock-toggle">
+                  <span class="dev-mock-knob"></span>
+                </span>
+              </div>
+              <div class="dev-mock-rev">
+                <span class="dev-mock-btn dev-mock-btn-primary">Load unpacked</span>
+                <span class="dev-mock-btn">Pack extension</span>
+                <span class="dev-mock-btn">Update</span>
+              </div>
+            </div>
+          </li>
+
+          <!-- Step 5 -->
+          <li class="istep">
+            <div class="istep-side">
+              <span class="istep-num">05</span>
+              <span class="istep-rail" aria-hidden="true"></span>
+            </div>
+            <div class="istep-body">
+              <h3>Click <em>Load unpacked</em>. Pick the folder.</h3>
+              <p>
+                Select the unzipped <code>inputr-0.1.0-chrome</code>
+                folder, not the zip and not a parent directory. Chrome
+                reads <code>manifest.json</code>, registers the extension,
+                and the orange Inputr tile appears on the page. That's it.
+                Inputr is live in every tab from this moment on.
+              </p>
+              <ul class="istep-bullets">
+                <li>Pick the folder that contains <code>manifest.json</code></li>
+                <li>If Chrome complains, you probably picked one level too high</li>
+              </ul>
+            </div>
+            <div class="istep-art istep-art-5" aria-hidden="true">
+              <div class="ext-card">
+                <div class="ext-card-icon">
+                  <span class="ext-mark"></span>
+                </div>
+                <div class="ext-card-body">
+                  <div class="ext-card-head">
+                    <span class="ext-card-name">Inputr</span>
+                    <span class="ext-card-ver">0.1.0</span>
+                  </div>
+                  <p class="ext-card-desc">
+                    Fix any image upload box on the web.
+                  </p>
+                  <div class="ext-card-foot">
+                    <span class="ext-card-id">ID · jh5k4d…</span>
+                    <span class="ext-card-on">
+                      <span class="ext-card-toggle"></span>
+                      On
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+
+          <!-- Step 6 -->
+          <li class="istep">
+            <div class="istep-side">
+              <span class="istep-num">06</span>
+            </div>
+            <div class="istep-body">
+              <h3>Pin Inputr to the toolbar. Optional, but do it.</h3>
+              <p>
+                Click the puzzle-piece icon next to your address bar, find
+                Inputr in the dropdown, hit the pin. The icon glows orange
+                when Inputr detects an upload box on the current page.
+                That's your signal to click it.
+              </p>
+            </div>
+            <div class="istep-art istep-art-6" aria-hidden="true">
+              <div class="pin-mock">
+                <div class="pin-mock-row">
+                  <span class="pin-mock-puzzle">
+                    <span></span><span></span><span></span><span></span>
+                  </span>
+                  <span class="pin-mock-name">Inputr</span>
+                  <span class="pin-mock-pin pin-on">
+                    <svg viewBox="0 0 16 16" width="14" height="14">
+                      <path
+                        d="M9.2 1.6l5.2 5.2-1.6 1.6-1.4-0.4-3 3 0.4 1.4-1.6 1.6-3-3-3.4 3.4-0.2-0.2 3.4-3.4-3-3 1.6-1.6 1.4 0.4 3-3-0.4-1.4z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </span>
+                </div>
+                <div class="pin-mock-row pin-mock-row-muted">
+                  <span class="pin-mock-puzzle pin-mock-puzzle-muted">
+                    <span></span><span></span><span></span><span></span>
+                  </span>
+                  <span class="pin-mock-name">Other extension</span>
+                  <span class="pin-mock-pin">
+                    <svg viewBox="0 0 16 16" width="14" height="14">
+                      <path
+                        d="M9.2 1.6l5.2 5.2-1.6 1.6-1.4-0.4-3 3 0.4 1.4-1.6 1.6-3-3-3.4 3.4-0.2-0.2 3.4-3.4-3-3 1.6-1.6 1.4 0.4 3-3-0.4-1.4z"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.2"
+                      />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <!-- ========================================================
+           VERIFY
+           ======================================================== -->
+      <section class="verify">
+        <div class="verify-inner">
+          <div class="verify-head">
+            <span class="kicker">Verify it works</span>
+            <h2>Open LinkedIn. Watch the icon turn orange.</h2>
+            <p>
+              Head to <code>linkedin.com/in/me/edit/banner</code>. The
+              Inputr toolbar icon should switch from grey to orange within
+              about a second. Click it and the side panel opens with the
+              banner's exact 1584 × 396 target preselected. If that
+              happens, you're done.
+            </p>
+            <div class="verify-actions">
+              <a
+                class="btn btn-primary"
+                href="https://www.linkedin.com/in/me/edit/banner/"
+                target="_blank"
+                rel="noopener"
+              >
+                Open LinkedIn banner editor
+                <span class="btn-arrow" aria-hidden="true">↗</span>
+              </a>
+              <a class="link-cta" href="/#sites">
+                See all supported sites
+                <span aria-hidden="true">↓</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="verify-card">
+            <div class="verify-card-head">
+              <span class="verify-led"></span>
+              <span class="verify-card-title">Inputr · status</span>
+            </div>
+            <ul class="verify-checks">
+              <li>
+                <span class="verify-tick">✓</span>
+                <span>Manifest registered</span>
+              </li>
+              <li>
+                <span class="verify-tick">✓</span>
+                <span>Content script loaded</span>
+              </li>
+              <li>
+                <span class="verify-tick">✓</span>
+                <span>Side panel attached</span>
+              </li>
+              <li>
+                <span class="verify-tick">✓</span>
+                <span>Constraints detected (1584 × 396)</span>
+              </li>
+            </ul>
+            <p class="verify-foot">All checks run locally. No network.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================
+           TROUBLESHOOT
+           ======================================================== -->
+      <section class="trouble" id="trouble">
+        <header class="section-head">
+          <span class="kicker">Troubleshoot</span>
+          <h2>If something looks off.</h2>
+        </header>
+
+        <div class="trouble-grid">
+          <article class="trouble-card">
+            <span class="trouble-tag">Chrome says…</span>
+            <h3>"Manifest file is missing or unreadable."</h3>
+            <p>
+              You picked the wrong folder, or the zip is still zipped.
+              <em>Load unpacked</em> wants the folder that contains
+              <code>manifest.json</code>. Open the folder you selected,
+              confirm <code>manifest.json</code> is sitting right there at
+              the top, then try again.
+            </p>
+          </article>
+
+          <article class="trouble-card">
+            <span class="trouble-tag">After a restart…</span>
+            <h3>The extension disappeared.</h3>
+            <p>
+              Chrome remembers the path to the unzipped folder, not the
+              contents. If you moved or deleted that folder, the extension
+              unloads. Put the folder back where it was, or hit
+              <em>Load unpacked</em> again and re-select its new home.
+            </p>
+          </article>
+
+          <article class="trouble-card">
+            <span class="trouble-tag">Every launch…</span>
+            <h3>"Disable developer mode extensions" banner.</h3>
+            <p>
+              Chrome shows that nag once per session for any side-loaded
+              extension. Click <em>Cancel</em>, never <em>Disable</em>.
+              The banner will be retired once Inputr is on the Chrome Web
+              Store. v1 is the target for that.
+            </p>
+          </article>
+
+          <article class="trouble-card">
+            <span class="trouble-tag">Updating later…</span>
+            <h3>How do I upgrade to a newer release?</h3>
+            <p>
+              Download the next zip, unzip it, and either replace the old
+              folder in place or pick the new folder via <em>Load
+              unpacked</em>. Chrome then keeps your settings. Auto-updates
+              are a Web Store feature and arrive with v1.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ========================================================
+           SOURCE / TRUST
+           ======================================================== -->
+      <section class="install-trust">
+        <div class="install-trust-inner">
+          <div class="install-trust-head">
+            <span class="kicker kicker-on-dark">Why side-load at all</span>
+            <h2>Read the source. Build the same zip.</h2>
+            <p>
+              Inputr is MIT licensed and entirely client-side. The release
+              zip is built from the
+              <a
+                href="https://github.com/namanbarkiya/inputr"
+                target="_blank"
+                rel="noopener"
+                >main branch</a
+              >
+              with <code>npm run zip</code>. If you'd rather build it
+              yourself, the commands below produce the same artifact.
+            </p>
+          </div>
+
+          <div class="install-trust-code">
+            <header>
+              <span class="install-trust-prompt">~/inputr</span>
+              <span class="install-trust-shell">zsh</span>
+            </header>
+            <pre><code><span class="t-c">git clone https://github.com/namanbarkiya/inputr.git</span>
+<span class="t-c">cd inputr</span>
+<span class="t-c">npm install</span>
+<span class="t-c">npm run zip</span>
+<span class="t-o"># → .output/inputr-0.1.0-chrome.zip</span></code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================
+           READY
+           ======================================================== -->
+      <section class="install-ready">
+        <header class="section-head">
+          <span class="kicker">Last step</span>
+          <h2>Now make uploads stop hurting.</h2>
+          <p class="section-sub">
+            Inputr ships free. No accounts, no tracking, no upsell.
+            Open an issue or a PR if you spot something off. The Chrome
+            Web Store listing arrives with v1.
+          </p>
+        </header>
+
+        <div class="install-ready-cta">
+          <a
+            class="btn btn-primary btn-lg"
+            href="https://github.com/namanbarkiya/inputr/releases/download/v0.1.0/inputr-0.1.0-chrome.zip"
+            download
+          >
+            Download .zip
+            <span class="btn-arrow" aria-hidden="true">↓</span>
+          </a>
+          <a
+            class="link-cta"
+            href="https://github.com/namanbarkiya/inputr"
+            target="_blank"
+            rel="noopener"
+          >
+            Star on GitHub
+            <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-top">
+        <a class="footer-logo" href="/" aria-label="Inputr home">
+          <img src="./logo.svg" alt="Inputr" />
+        </a>
+        <p class="footer-tag">
+          Free forever. Open source since day one. <br />Built so the upload
+          box gets out of your way.
+        </p>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copy">
+          MIT licensed. Built by
+          <a href="https://github.com/namanbarkiya" target="_blank"
+            >Naman Barkiya</a
+          >. This page uses cookie-less Vercel analytics.
+        </p>
+        <nav class="footer-nav" aria-label="Footer">
+          <a href="/install">Install</a>
+          <a href="https://github.com/namanbarkiya/inputr" target="_blank">GitHub</a>
+          <a
+            href="https://github.com/namanbarkiya/inputr/blob/main/LICENSE"
+            target="_blank"
+            >License</a
+          >
+          <a
+            href="https://github.com/namanbarkiya/inputr/blob/main/SECURITY.md"
+            target="_blank"
+            >Security</a
+          >
+        </nav>
+      </div>
+    </footer>
+
+    <script src="./script.js" defer></script>
+    <script>
+      (() => {
+        const btns = document.querySelectorAll('.copy-btn');
+        btns.forEach((btn) => {
+          btn.addEventListener('click', async () => {
+            const text = btn.dataset.copy || '';
+            try {
+              await navigator.clipboard.writeText(text);
+              btn.classList.add('is-copied');
+              const arrow = btn.querySelector('.btn-arrow');
+              const prevArrow = arrow ? arrow.textContent : '';
+              if (arrow) arrow.textContent = '✓';
+              setTimeout(() => {
+                btn.classList.remove('is-copied');
+                if (arrow) arrow.textContent = prevArrow;
+              }, 1600);
+            } catch {
+              /* clipboard blocked, ignore */
+            }
+          });
+        });
+      })();
+    </script>
+
+    <script>
+      window.va =
+        window.va ||
+        function () {
+          (window.vaq = window.vaq || []).push(arguments);
+        };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
+    <script defer src="/_vercel/speed-insights/script.js"></script>
+  </body>
+</html>

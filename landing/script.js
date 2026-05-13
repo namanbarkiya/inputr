@@ -92,4 +92,127 @@
       }
     });
   });
+
+  // Try-here: surface the picked file and support drag/drop.
+  // The <input type="file"> is real so the Inputr extension's content
+  // script can detect it and parse the helper label next to it.
+  const tryDrop = document.querySelector('.try-drop');
+  const tryInput = document.querySelector('.try-input');
+  const tryStatus = document.querySelector('[data-try-status]');
+  const tryStatusText = tryStatus
+    ? tryStatus.querySelector('.try-status-text')
+    : null;
+  const tryPreview = document.querySelector('[data-try-preview]');
+  const tryPreviewRatio = document.querySelector('[data-try-preview-ratio]');
+  const tryHeadline = document.querySelector('[data-try-headline]');
+  const tryCta = document.querySelector('[data-try-cta]');
+  const tryClear = document.querySelector('[data-try-clear]');
+
+  const HEADLINE_DEFAULT = tryHeadline ? tryHeadline.textContent : '';
+  const CTA_DEFAULT = tryCta ? tryCta.textContent : '';
+  let lastObjectUrl = null;
+
+  const formatBytes = (n) => {
+    if (n < 1024) return `${n} B`;
+    if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+    return `${(n / (1024 * 1024)).toFixed(2)} MB`;
+  };
+
+  const releasePreview = () => {
+    if (lastObjectUrl) {
+      URL.revokeObjectURL(lastObjectUrl);
+      lastObjectUrl = null;
+    }
+  };
+
+  const resetUI = () => {
+    if (tryStatus) tryStatus.classList.remove('is-ok');
+    if (tryStatusText) tryStatusText.textContent = 'No file picked yet.';
+    if (tryDrop) tryDrop.classList.remove('is-loaded');
+    if (tryHeadline) tryHeadline.textContent = HEADLINE_DEFAULT;
+    if (tryCta) tryCta.textContent = CTA_DEFAULT;
+    if (tryPreview) {
+      tryPreview.removeAttribute('src');
+      tryPreview.alt = '';
+    }
+    if (tryPreviewRatio) tryPreviewRatio.textContent = '';
+    if (tryClear) tryClear.hidden = true;
+    releasePreview();
+  };
+
+  const reportFile = (file) => {
+    if (!tryStatus || !tryStatusText) return;
+    if (!file) {
+      resetUI();
+      return;
+    }
+
+    tryStatus.classList.add('is-ok');
+    if (tryDrop) tryDrop.classList.add('is-loaded');
+
+    const name = file.name || 'image';
+    tryStatusText.innerHTML =
+      `<strong>${name}</strong> · ${formatBytes(file.size)} · ` +
+      `${file.type || 'image'}`;
+
+    if (tryHeadline) tryHeadline.textContent = 'Looks good. Got it.';
+    if (tryCta) tryCta.textContent = 'Replace file';
+    if (tryClear) tryClear.hidden = false;
+
+    if (tryPreview && file.type && file.type.startsWith('image/')) {
+      releasePreview();
+      lastObjectUrl = URL.createObjectURL(file);
+      tryPreview.src = lastObjectUrl;
+      tryPreview.alt = name;
+      tryPreview.onload = () => {
+        if (tryPreviewRatio && tryPreview.naturalWidth) {
+          tryPreviewRatio.textContent =
+            `${tryPreview.naturalWidth} × ${tryPreview.naturalHeight}`;
+        }
+      };
+    }
+  };
+
+  if (tryInput) {
+    tryInput.addEventListener('change', () => {
+      reportFile(tryInput.files && tryInput.files[0]);
+    });
+  }
+
+  if (tryClear && tryInput) {
+    tryClear.addEventListener('click', () => {
+      tryInput.value = '';
+      resetUI();
+    });
+  }
+
+  if (tryDrop && tryInput) {
+    ['dragenter', 'dragover'].forEach((evt) => {
+      tryDrop.addEventListener(evt, (e) => {
+        e.preventDefault();
+        tryDrop.classList.add('is-drag');
+      });
+    });
+    ['dragleave', 'dragend'].forEach((evt) => {
+      tryDrop.addEventListener(evt, () => {
+        tryDrop.classList.remove('is-drag');
+      });
+    });
+    tryDrop.addEventListener('drop', (e) => {
+      e.preventDefault();
+      tryDrop.classList.remove('is-drag');
+      const files = e.dataTransfer && e.dataTransfer.files;
+      if (!files || !files.length) return;
+      // Mirror the dropped file onto the real input so listeners and the
+      // extension's detector both see it as if the user clicked.
+      try {
+        const dt = new DataTransfer();
+        dt.items.add(files[0]);
+        tryInput.files = dt.files;
+      } catch {
+        /* DataTransfer assignment may be blocked in older browsers */
+      }
+      reportFile(files[0]);
+    });
+  }
 })();

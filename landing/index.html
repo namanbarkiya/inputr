@@ -101,13 +101,7 @@
         >
           GitHub
         </a>
-        <a
-          class="btn btn-primary"
-          href="https://github.com/namanbarkiya/inputr"
-          target="_blank"
-          rel="noopener"
-          >Install free</a
-        >
+        <a class="btn btn-primary" href="/install">Install free</a>
       </div>
     </header>
 
@@ -135,17 +129,12 @@
         </p>
 
         <div class="hero-cta">
-          <a
-            class="btn btn-primary btn-lg"
-            href="https://github.com/namanbarkiya/inputr"
-            target="_blank"
-            rel="noopener"
-          >
+          <a class="btn btn-primary btn-lg" href="/install">
             Install free
             <span class="btn-arrow" aria-hidden="true">→</span>
           </a>
-          <a class="link-cta" href="#how">
-            How it works
+          <a class="link-cta" href="#try">
+            Try it on this page
             <span aria-hidden="true">↓</span>
           </a>
         </div>
@@ -523,6 +512,113 @@
       </section>
 
       <!-- ========================================================
+           TRY HERE
+           Real <input type="file"> with helper text the extension
+           parses. After installing, the toolbar icon should turn
+           orange on this section and the side panel preselects the
+           target dimensions written below.
+           ======================================================== -->
+      <section class="try" id="try">
+        <header class="section-head">
+          <span class="kicker">Try it here</span>
+          <h2>Test the extension on this page.</h2>
+          <p class="section-sub">
+            This is a real <code>&lt;input type="file"&gt;</code> with a
+            real constraint label. Installed Inputr? The toolbar icon
+            should glow orange and read <em>1200 × 800 · max 5&nbsp;MB</em>
+            without you doing anything. Click the icon to open the side
+            panel, or use the box below as a vanilla file picker.
+          </p>
+        </header>
+
+        <form class="try-form" onsubmit="return false" aria-label="Try Inputr upload demo">
+          <div class="try-box" data-try-box>
+            <label class="try-drop" for="try-input">
+              <span class="try-visual" aria-hidden="true">
+                <span class="try-icon">
+                  <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
+                  </svg>
+                </span>
+                <span class="try-preview-frame" data-try-preview-frame>
+                  <img
+                    class="try-preview"
+                    alt=""
+                    data-try-preview
+                  />
+                  <span class="try-preview-ratio" data-try-preview-ratio></span>
+                </span>
+              </span>
+
+              <span class="try-headline" data-try-headline>Drop your banner here</span>
+              <span class="try-helper">
+                Recommended <strong>1200 × 800</strong>, PNG or JPEG,
+                max 5&nbsp;MB
+              </span>
+              <input
+                id="try-input"
+                class="try-input"
+                type="file"
+                accept="image/png,image/jpeg"
+                aria-describedby="try-status"
+              />
+              <span class="try-cta" data-try-cta>Choose file</span>
+            </label>
+
+            <output id="try-status" class="try-status" data-try-status>
+              <span class="try-status-dot"></span>
+              <span class="try-status-text">No file picked yet.</span>
+              <button
+                class="try-status-clear"
+                type="button"
+                data-try-clear
+                aria-label="Clear picked file"
+                hidden
+              >
+                Clear
+              </button>
+            </output>
+          </div>
+
+          <aside class="try-aside">
+            <header class="try-aside-head">
+              <span class="try-aside-dot"></span>
+              <span class="try-aside-title">What Inputr sees</span>
+            </header>
+            <ul class="try-aside-list">
+              <li>
+                <span class="try-aside-key">Target</span>
+                <span class="try-aside-val">1200 × 800</span>
+              </li>
+              <li>
+                <span class="try-aside-key">Formats</span>
+                <span class="try-aside-val">PNG, JPEG</span>
+              </li>
+              <li>
+                <span class="try-aside-key">Max size</span>
+                <span class="try-aside-val">5 MB</span>
+              </li>
+              <li>
+                <span class="try-aside-key">Source</span>
+                <span class="try-aside-val">Helper label</span>
+              </li>
+            </ul>
+            <p class="try-aside-foot">
+              The extension parses the label next to the input. Same way
+              it handles any site that isn't on the known list.
+            </p>
+          </aside>
+        </form>
+
+        <p class="try-disclaimer">
+          Don't have the extension yet?
+          <a href="/install">Install it in ninety seconds →</a>
+        </p>
+      </section>
+
+      <!-- ========================================================
            INSTALL
            ======================================================== -->
       <section class="install" id="install">
@@ -532,40 +628,35 @@
         </header>
 
         <div class="install-grid">
-          <a
-            class="install-card install-primary"
-            href="https://github.com/namanbarkiya/inputr"
-            target="_blank"
-            rel="noopener"
-          >
-            <span class="install-status">Open source · MIT</span>
-            <h3>Get it on GitHub</h3>
+          <a class="install-card install-primary" href="/install">
+            <span class="install-status">v0.1.0 · 1.2 MB</span>
+            <h3>Download the zip</h3>
             <p>
-              The full extension lives in the repo. Star it to follow new
-              releases, open an issue, or send a PR. Chrome Web Store
-              listing comes after v1 is signed off.
+              Side-load the v0.1.0 release into Chrome in ninety seconds.
+              Five clicks, one folder, no accounts. The full install
+              guide is on the next page.
             </p>
             <span class="install-foot">
-              <span>github.com/namanbarkiya/inputr</span>
+              <span>inputr.vercel.app/install</span>
               <span class="install-arrow">↗</span>
             </span>
           </a>
 
           <a
             class="install-card"
-            href="https://github.com/namanbarkiya/inputr#install"
+            href="https://github.com/namanbarkiya/inputr"
             target="_blank"
             rel="noopener"
           >
-            <span class="install-status">Available now</span>
-            <h3>Build from source</h3>
+            <span class="install-status">Open source · MIT</span>
+            <h3>Read the source</h3>
             <p>
-              <code>git clone</code> the repo, run <code>npm install</code>
-              and <code>npm run zip</code>, side-load the
-              <code>.zip</code> into Chrome. Two minutes, end to end.
+              Inputr lives on GitHub. Star to follow releases, open an
+              issue, or send a PR. <code>npm install</code> then
+              <code>npm run zip</code> reproduces the same artifact.
             </p>
             <span class="install-foot">
-              <span>Setup steps in the README</span>
+              <span>github.com/namanbarkiya/inputr</span>
               <span class="install-arrow">↗</span>
             </span>
           </a>
